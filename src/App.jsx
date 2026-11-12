@@ -38,8 +38,8 @@ function Login({ client }) {
 
   return <main className="login-layout">
     <section className="card login-card">
-      <span className="brand-mark" aria-hidden="true">养</span>
-      <h1>养己</h1>
+      <span className="brand-mark" aria-hidden="true">日</span>
+      <h1>日迹</h1>
       <p className="muted">时间与成长记录</p>
       <form className="record-form" onSubmit={submit}>
         <label htmlFor="email">邮箱
@@ -146,7 +146,7 @@ function Diary({ client }) {
   return <>
     <header className="topbar">
       <div className="shell">
-        <div className="brand"><span className="brand-mark" aria-hidden="true">养</span><strong>养己</strong></div>
+        <div className="brand"><span className="brand-mark" aria-hidden="true">日</span><strong>日迹</strong></div>
         <button type="button" className="icon-button" aria-label="设置" aria-current={page === 'settings' ? 'page' : undefined}
           onClick={() => navigate('settings')}><Icon as={SettingsIcon} /></button>
       </div>

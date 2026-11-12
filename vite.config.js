@@ -13,7 +13,7 @@ export default defineConfig({
     registerType: 'autoUpdate',
     injectRegister: 'script',
     manifest: {
-      id: '/', name: '养己', short_name: '养己', description: '时间与成长记录', lang: 'zh-CN',
+      id: '/', name: '日迹', short_name: '日迹', description: '时间与成长记录', lang: 'zh-CN',
       start_url: '/', scope: '/', display: 'standalone',
       theme_color: themeColor, background_color: themeColor,
       icons: [192, 512].map((size) => ({ src: `/icon-${size}.png`, sizes: `${size}x${size}`, type: 'image/png', purpose: 'any maskable' })),
