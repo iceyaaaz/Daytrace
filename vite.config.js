@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'node:fs';
 
+// 从样式令牌读取主题色，供网页和手机安装清单共用。
 const themeColor = readFileSync(new URL('./src/styles/tokens.css', import.meta.url), 'utf8').match(/--bg:\s*([^;]+)/)[1].trim();
 
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
   }, VitePWA({
     registerType: 'autoUpdate',
     injectRegister: 'script',
+    // 安装清单定义主屏幕名称、图标和独立窗口的启动方式。
     manifest: {
       id: '/', name: '日迹', short_name: '日迹', description: '时间与成长记录', lang: 'zh-CN',
       start_url: '/', scope: '/', display: 'standalone',
@@ -36,6 +38,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // 将图表渲染和 Supabase 客户端分别打包，便于浏览器复用缓存。
           if (id.includes('/node_modules/zrender/')) return 'chart-renderer';
           if (id.includes('/node_modules/@supabase/')) return 'supabase-client';
         },
