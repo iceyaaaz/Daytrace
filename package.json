@@ -1,6 +1,7 @@
 {
-  "name": "growth-diary",
-  "version": "0.1.0",
+  "name": "daytrace",
+  "version": "2.1.2",
+  "description": "日迹，记录时间与成长的中文日记应用",
   "private": true,
   "type": "module",
   "engines": {
