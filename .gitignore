@@ -1,6 +1,12 @@
+# 安装依赖和构建输出
 node_modules/
 dist/
+
+# 本地测试、截图及运行日志
 work/
 outputs/
+*.log
+
+# 本地环境变量，只跟踪空白模板
 .env*
 !.env.example
