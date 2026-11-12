@@ -2,7 +2,8 @@ import { Component, lazy, Suspense } from 'react';
 import { categories, categoryIds, durationDelta, durationText } from '../domain/records.js';
 
 const Chart = lazy(() => import('./Chart.jsx'));
-const colors = categoryIds.map((category) => categories[category].color);
+const color = (token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+const colors = () => categoryIds.map((category) => color(categories[category].color));
 const legend = { type: 'scroll', bottom: 0, icon: 'circle' };
 const percentage = (tenths) => `${(tenths / 10).toFixed(1)}%`;
 
@@ -36,7 +37,7 @@ function CategoryTable({ rows }) {
 
 function pieOption(rows) {
   return {
-    color: colors, legend,
+    color: colors(), legend,
     tooltip: {
       trigger: 'item', renderMode: 'richText',
       formatter: ({ name, data }) => `${name}\n${durationText(data.value)} · ${percentage(data.tenths)}`,
@@ -51,7 +52,7 @@ function pieOption(rows) {
 function dailyOption(days) {
   const zoom = days.length > 31;
   return {
-    color: colors, legend,
+    color: colors(), legend,
     grid: { left: 53, right: 20, top: 22, bottom: zoom ? 74 : 52 },
     tooltip: { trigger: 'axis', renderMode: 'richText', confine: true, valueFormatter: durationText },
     xAxis: { type: 'category', data: days.map(({ date }) => date), axisLabel: { formatter: (date) => date.slice(5) } },
@@ -66,7 +67,7 @@ function dailyOption(days) {
 
 function tagOption(tags) {
   return {
-    color: ['#38796c'],
+    color: [color(categories.skill.color)],
     grid: { left: 18, right: 24, top: 22, bottom: 25, containLabel: true },
     tooltip: { trigger: 'axis', renderMode: 'richText', confine: true, valueFormatter: durationText },
     xAxis: { type: 'value', name: '分钟', minInterval: 1 },

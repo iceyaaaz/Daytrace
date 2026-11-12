@@ -1,4 +1,4 @@
-# 成长日记
+# 养己
 
 自己用的中文时间日记。应用包含登录、今日填写、历史、统计、周报、标签管理、CSV 导出和手机桌面安装。
 
@@ -16,7 +16,7 @@
 
 1. 在 Supabase 项目顶部点 **Connect**，复制 **Project URL** 和 **Publishable key**。在项目文件夹复制 `.env.example`，把副本命名为 `.env.local`。在两个等号后分别粘贴对应的值。保存时确认文件名末尾没有 `.txt`。网址和公开密钥之外的凭据留在你手里。
 2. 在项目文件夹中打开 PowerShell。若第一次运行，执行 `npm.cmd ci`。然后执行 `npm.cmd run dev -- --port 5173`。
-3. 打开 [本地成长日记](http://127.0.0.1:5173/)，输入刚才在 **Authentication → Users** 中创建的测试邮箱和密码。修改 `.env.local` 后，关闭并重启第 2 步的命令。
+3. 打开 [本地养己](http://127.0.0.1:5173/)，输入刚才在 **Authentication → Users** 中创建的测试邮箱和密码。修改 `.env.local` 后，关闭并重启第 2 步的命令。
 
 这条本地网址只在运行项目的电脑上打开。部署后可在不同设备打开同一个线上网址，使用同一个日记账号查看记录。手机安装需要打开线上 HTTPS 网址。若要在电脑本地检查安装和更新，运行 `npm.cmd run build`，再运行 `npm.cmd run preview`，打开命令行显示的网址。
 
@@ -56,8 +56,8 @@ npm.cmd run build
 
 `src/domain/` 放日期、记录校验和统计纯函数。`src/data/` 负责和数据库通信，超过单页上限时按日期和记录 ID 继续读取。`tests/` 是可直接运行的单元测试。
 
-依赖用途：React 和 React DOM 渲染页面，Vite 与 React 插件用于本地预览和打包，Supabase JavaScript 客户端负责登录与数据请求，ECharts 绘制图表，`vite-plugin-pwa` 生成手机安装清单与静态页面缓存。日记请求不进入这份缓存。单元测试使用 Node.js 自带工具。
+依赖用途：React 和 React DOM 渲染页面，Vite 与 React 插件用于本地预览和打包，Supabase JavaScript 客户端负责登录与数据请求，ECharts 绘制图表，`lucide-react` 提供板块和导航等线性图标，`vite-plugin-pwa` 生成手机安装清单与静态页面缓存。日记请求不进入这份缓存。单元测试使用 Node.js 自带工具。
 
 每日一言在 `src/data/quotes.json`。修改 `text` 为正文，`author` 为作者（可留空），至少保留一条。应用按所选日期轮换。
 
-应用图标放在 `public/icon-192.png` 和 `public/icon-512.png`。替换时保持尺寸和文件名。普通填写、标签和导出操作可看 [一页使用说明](使用说明.md)。
+应用图标放在 `public/icon-192.png`、`public/icon-512.png` 和 `public/apple-touch-icon.png`（180 × 180）。替换时保持尺寸和文件名。普通填写、标签和导出操作可看 [一页使用说明](使用说明.md)。

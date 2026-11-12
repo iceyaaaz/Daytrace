@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { addDays, isRecordDate, localDate, quoteForDate, statsRange, weekRange } from '../src/domain/dates.js';
-import { categoryIds, durationDelta, durationOptionLabel, durationOptions, emptyRecord, recordValues, tagName } from '../src/domain/records.js';
+import { categoryIds, durationDelta, durationOptionLabel, durationOptions, emptyRecord, formatDuration, recordValues, tagName } from '../src/domain/records.js';
 import { minutesTotal, summarize, withWeekComparison } from '../src/domain/statistics.js';
 
 const entry = (record_date, category, minutes, tags = []) => ({ record_date, category, minutes, tags });
@@ -28,10 +28,14 @@ test('T-12：完整 35 档与时长文字', () => {
   assert.deepEqual(durationOptions.slice(0, 12), [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
   assert.ok(durationOptions.slice(12).every((value, index) => value === 60 + index * 30));
   assert.equal(durationOptions.at(-1), 720);
-  assert.equal(durationOptionLabel(55), '55min');
-  assert.equal(durationOptionLabel(90), '1.5h');
-  assert.equal(durationDelta(125), '+2h 5min');
-  assert.equal(durationDelta(-30), '-30min');
+  assert.equal(durationOptionLabel(55), '55 分钟');
+  assert.equal(durationOptionLabel(90), '1.5 小时');
+  assert.equal(durationDelta(125), '▲ 2 小时 5 分钟');
+  assert.equal(durationDelta(-30), '▼ 30 分钟');
+  assert.equal(durationDelta(0), '—');
+  assert.deepEqual([0, 5, 55, 60, 80, 90, 720].map((minutes) => formatDuration(minutes)), [
+    '0 分钟', '5 分钟', '55 分钟', '1 小时', '1 小时 20 分钟', '1 小时 30 分钟', '12 小时',
+  ]);
 });
 
 test('T-13、T-18：各板块校验必填项和允许留空的字段', () => {

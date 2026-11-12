@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export function useQuery(load, key) {
+export function useQuery(load, key, { retain = false } = {}) {
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState(null);
 
@@ -8,7 +8,7 @@ export function useQuery(load, key) {
     const controller = new AbortController();
     load(controller.signal).then(
       (data) => {
-        if (!controller.signal.aborted) setState({ key, attempt, status: 'ready', data });
+        if (!controller.signal.aborted) setState({ key, attempt, load, status: 'ready', data });
       },
       () => {
         if (!controller.signal.aborted) setState({ key, attempt, status: 'error' });
@@ -17,6 +17,7 @@ export function useQuery(load, key) {
     return () => controller.abort();
   }, [load, key, attempt]);
 
-  const result = state?.key === key && state.attempt === attempt ? state : { status: 'loading' };
+  const result = state?.key === key && state.attempt === attempt ? state
+    : retain && state?.load === load && state.status === 'ready' ? state : { status: 'loading' };
   return { ...result, retry: () => setAttempt((value) => value + 1) };
 }

@@ -10,10 +10,11 @@ export default function Chart({ option, label }) {
   const container = useRef(null);
   useEffect(() => {
     const chart = init(container.current);
+    const tokens = getComputedStyle(document.documentElement);
     chart.setOption({
       animation: false,
       aria: { enabled: true },
-      textStyle: { color: '#394842', fontFamily: 'system-ui, sans-serif' },
+      textStyle: { color: tokens.getPropertyValue('--text-2').trim(), fontFamily: tokens.getPropertyValue('--font-body').trim() },
       ...option,
     });
     const observer = new ResizeObserver(() => chart.resize());

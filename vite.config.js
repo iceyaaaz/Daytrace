@@ -1,15 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'node:fs';
+
+const themeColor = readFileSync(new URL('./src/styles/tokens.css', import.meta.url), 'utf8').match(/--bg:\s*([^;]+)/)[1].trim();
 
 export default defineConfig({
-  plugins: [react(), VitePWA({
+  plugins: [react(), {
+    name: 'app-theme-color',
+    transformIndexHtml: (html) => html.replace('__APP_THEME_COLOR__', themeColor),
+  }, VitePWA({
     registerType: 'autoUpdate',
     injectRegister: 'script',
     manifest: {
-      id: '/', name: '成长日记', short_name: '日记', lang: 'zh-CN',
+      id: '/', name: '养己', short_name: '养己', description: '时间与成长记录', lang: 'zh-CN',
       start_url: '/', scope: '/', display: 'standalone',
-      theme_color: '#f4f7f3', background_color: '#f4f7f3',
+      theme_color: themeColor, background_color: themeColor,
       icons: [192, 512].map((size) => ({ src: `/icon-${size}.png`, sizes: `${size}x${size}`, type: 'image/png', purpose: 'any maskable' })),
     },
     workbox: {
@@ -31,6 +37,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('/node_modules/zrender/')) return 'chart-renderer';
+          if (id.includes('/node_modules/@supabase/')) return 'supabase-client';
         },
       },
     },

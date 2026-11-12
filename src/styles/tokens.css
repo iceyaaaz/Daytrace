@@ -1,0 +1,51 @@
+:root {
+  --bg: #F7F4EE;
+  --surface: #FFFFFF;
+  --surface-2: #FBF9F5;
+  --border: #E9E3D8;
+  --border-strong: #D9D1C3;
+  --text: #1F2421;
+  --text-2: #59605B;
+  --text-3: #6F7671;
+  --brand: #1F4D3F;
+  --brand-hover: #173D32;
+  --brand-soft: #E4EFEA;
+  --danger: #C0392B;
+  --danger-soft: #FBE9E7;
+  --warn-soft: #FFF3DA;
+  --idea: #F0A02B; --idea-soft: #FFF3DA; --idea-text: #7A4B00;
+  --book: #4C63D2; --book-soft: #E8ECFC; --book-text: #243A9B;
+  --skill: #1FA37A; --skill-soft: #DDF4EA; --skill-text: #0B6A4B;
+  --exercise: #F26B4E; --exercise-soft: #FDE7E1; --exercise-text: #A33A22;
+  --news: #2A9DB5; --news-soft: #DDF1F6; --news-text: #0F5F72;
+  --fun-offline: #D9569B; --fun-offline-soft: #FBE4F0; --fun-offline-text: #8F2A60;
+  --fun-phone: #8B5CD6; --fun-phone-soft: #EEE6FB; --fun-phone-text: #5230A0;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px;
+  --radius-card: 16px; --radius-control: 12px; --radius-sheet: 20px; --radius-pill: 999px;
+  --title-size: 24px; --title-line: 32px;
+  --card-size: 17px; --card-line: 24px;
+  --body-size: 15px; --body-line: 22px;
+  --small-size: 13px; --small-line: 18px;
+  --quote-size: 20px; --quote-line: 30px;
+  --field-size: 16px; --field-line: 24px;
+  --detail-size: 14px; --detail-line: 21px;
+  --weight-normal: 400; --weight-strong: 600;
+  --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-quote: "Songti SC", "Noto Serif SC", "Source Han Serif SC", serif;
+  --line: 1px; --accent-line: 3px; --focus-line: 2px;
+  --tap: 44px; --control: 48px; --day-row: 56px; --entry-row: 64px;
+  --icon-logo: 28px; --icon-box: 40px; --icon: 24px; --icon-small: 16px; --icon-menu: 20px;
+  --bar: 12px; --mini-bar: 4px; --chip: 32px; --small-chip: 24px;
+  --top: 56px; --nav: 64px; --shell: 640px; --login: 418px;
+  --top-inset: calc(var(--top) + env(safe-area-inset-top));
+  --bottom-inset: calc(var(--nav) + env(safe-area-inset-bottom));
+  --shadow: 0 1px 2px rgb(31 36 33 / .05), 0 6px 20px rgb(31 36 33 / .05);
+  --scrim: rgb(31 36 33 / .42);
+  --motion: 160ms; --expand: 240ms; --ease: cubic-bezier(.2,.8,.2,1);
+  --chart-height: 278px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion: 0ms; --expand: 0ms; }
+}

@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BarChart3, BookOpen, CalendarDays, Check, NotebookPen, Settings as SettingsIcon } from 'lucide-react';
+import { Icon } from './components/DiaryUI.jsx';
 import { Feedback, QueryState } from './components/Feedback.jsx';
 import { useQuery } from './components/useQuery.js';
 import { createRepository } from './data/repository.js';
 import { supabase } from './data/supabase.js';
 import { localDate } from './domain/dates.js';
 import { tagName } from './domain/records.js';
+import { toastAfterUndo } from './domain/todayFlow.js';
 import { History } from './pages/History.jsx';
 import { Settings } from './pages/Settings.jsx';
 import { Stats, Weekly } from './pages/Stats.jsx';
 import { Today } from './pages/Today.jsx';
 
-const tabs = [['today', '今日'], ['history', '历史'], ['stats', '统计'], ['weekly', '周报']];
+const tabs = [['today', '今日', NotebookPen], ['history', '历史', BookOpen], ['stats', '统计', BarChart3], ['weekly', '周报', CalendarDays]];
 
 function Login({ client }) {
   const [email, setEmail] = useState('');
@@ -35,9 +38,9 @@ function Login({ client }) {
 
   return <main className="login-layout">
     <section className="card login-card">
-      <span className="brand-mark" aria-hidden="true">记</span>
-      <h1>成长日记</h1>
-      <p className="muted">记录时间，也记下今天的想法。</p>
+      <span className="brand-mark" aria-hidden="true">养</span>
+      <h1>养己</h1>
+      <p className="muted">时间与成长记录</p>
       <form className="record-form" onSubmit={submit}>
         <label htmlFor="email">邮箱
           <input id="email" type="email" autoComplete="username" required value={email}
@@ -61,7 +64,10 @@ function Diary({ client }) {
   const [today, setToday] = useState(() => localDate());
   const [version, setVersion] = useState(0);
   const [tagVersion, setTagVersion] = useState(0);
-  const [message, setMessage] = useState('');
+  const [historyVisited, setHistoryVisited] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [undoBusy, setUndoBusy] = useState(false);
+  const undoLock = useRef(false);
   const tagQuery = useQuery(repository.listTags, tagVersion);
 
   useEffect(() => {
@@ -71,15 +77,43 @@ function Diary({ client }) {
     return () => { window.clearInterval(timer); window.removeEventListener('focus', update); };
   }, []);
 
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast((current) => current === toast ? null : current), toast.duration);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   function navigate(next) {
     setPage(next);
-    setMessage('');
+    if (next === 'history') setHistoryVisited(true);
     window.scrollTo(0, 0);
   }
 
-  function onChange(status) {
+  function notify(message, recordId) {
+    setToast({ message, recordId, duration: 5000 });
+  }
+
+  function onChange(message, recordId) {
     setVersion((value) => value + 1);
-    setMessage(status);
+    notify(message, recordId);
+  }
+
+  async function undo() {
+    if (!toast?.recordId || undoLock.current) return;
+    undoLock.current = true;
+    setUndoBusy(true);
+    try {
+      await repository.deleteRecord(toast.recordId);
+      setVersion((value) => value + 1);
+      setToast((current) => toastAfterUndo(current, toast));
+    } catch {
+      setToast((current) => current === toast
+        ? { ...toast, message: '撤销失败，请检查网络后重试', error: true }
+        : current);
+    } finally {
+      undoLock.current = false;
+      setUndoBusy(false);
+    }
   }
 
   async function createTag(category, value) {
@@ -108,28 +142,34 @@ function Diary({ client }) {
     if (error) throw error;
   }, [client]);
 
-  const props = { today, repository, tags: tagQuery.data ?? [], createTag, version, onChange };
+  const props = { today, repository, tags: tagQuery.data ?? [], createTag, version, onChange, notify, navigate };
   return <>
     <header className="topbar">
       <div className="shell">
-        <div className="brand"><span className="brand-mark" aria-hidden="true">记</span><strong>成长日记</strong></div>
-        <button type="button" aria-current={page === 'settings' ? 'page' : undefined} onClick={() => navigate('settings')}>设置</button>
+        <div className="brand"><span className="brand-mark" aria-hidden="true">养</span><strong>养己</strong></div>
+        <button type="button" className="icon-button" aria-label="设置" aria-current={page === 'settings' ? 'page' : undefined}
+          onClick={() => navigate('settings')}><Icon as={SettingsIcon} /></button>
       </div>
     </header>
     <main className="shell main-content">
-      <div className="global-feedback" role="status">{message}</div>
       {['today', 'history'].includes(page) && tagQuery.status === 'error' &&
         <QueryState query={tagQuery} message="读取标签失败，请检查网络后重试。" />}
-      {page === 'today' && <Today {...props} />}
-      {page === 'history' && <History {...props} />}
+      <div hidden={page !== 'today'}><Today {...props} active={page === 'today'} /></div>
+      {historyVisited && <div hidden={page !== 'history'}><History {...props} /></div>}
       {page === 'stats' && <Stats {...props} />}
       {page === 'weekly' && <Weekly {...props} />}
       {page === 'settings' && <Settings repository={repository} tagQuery={tagQuery} createTag={createTag} removeTag={removeTag} signOut={signOut} />}
     </main>
     <nav className="bottom-nav" aria-label="主导航"><div className="shell">
-      {tabs.map(([id, label]) => <button key={id} type="button" aria-current={page === id ? 'page' : undefined}
-        onClick={() => navigate(id)}>{label}</button>)}
+      {tabs.map(([id, label, graphic]) => <button key={id} type="button" aria-current={page === id ? 'page' : undefined}
+        onClick={() => navigate(id)}><Icon as={graphic} /><span>{label}</span></button>)}
     </div></nav>
+    <div className="toast-region shell" aria-live="polite">
+      {toast && <div className={toast.error ? 'toast notice error' : 'toast'}>
+        {!toast.error && <Icon as={Check} />}<span>{toast.message}</span>
+        {toast.recordId && <button type="button" className="text-button" onClick={undo} disabled={undoBusy}>撤销</button>}
+      </div>}
+    </div>
   </>;
 }
 

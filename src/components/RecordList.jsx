@@ -1,59 +1,70 @@
 import { useState } from 'react';
-import { categories, durationText } from '../domain/records.js';
+import { Ellipsis, Pencil, Trash2 } from 'lucide-react';
+import { categories, categoryStyle } from '../domain/categories.js';
+import { formatDuration } from '../domain/records.js';
+import { Icon, Sheet } from './DiaryUI.jsx';
 import { Feedback } from './Feedback.jsx';
 import { RecordForm } from './RecordForm.jsx';
 
-export function RecordList({ records, repository, tags, createTag, onChange, showCategory = false }) {
-  const [editing, setEditing] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [deleting, setDeleting] = useState(false);
+function RecordRow({ record, repository, tags, createTag, onChange }) {
+  const [mode, setMode] = useState('');
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-
-  async function remove(id) {
+  const fields = categories[record.category];
+  const close = () => { setError(''); setMode(''); };
+  async function remove() {
+    if (busy) return;
     setError('');
-    setDeleting(true);
+    setBusy(true);
     try {
-      await repository.deleteRecord(id);
-      setConfirm('');
-      onChange('已删除记录');
+      await repository.deleteRecord(record.id);
+      close();
+      onChange('已删除');
     } catch {
       setError('删除失败，请检查网络后重试。');
     } finally {
-      setDeleting(false);
+      setBusy(false);
     }
   }
 
-  return <ul className="records">
-    {records.map((record) => (
-      <li key={record.id} className="record">
-        {editing === record.id ? (
-          <RecordForm category={record.category} record={record} date={record.record_date}
-            repository={repository} tags={tags} createTag={createTag}
-            onSaved={() => { setEditing(''); onChange('已更新记录'); }} onCancel={() => setEditing('')} />
-        ) : <>
-          <div className="record-meta">
-            {showCategory && <strong>{categories[record.category].label}</strong>}
-            <span>{durationText(record.minutes)}</span>
-            {record.tags.map((tag) => <span key={tag} className="pill">{tag}</span>)}
-          </div>
-          {record.content && <p className="record-text">{record.content}</p>}
-          {record.gain && <p className="record-text muted">{categories[record.category].gain} · {record.gain}</p>}
-          <div className="actions compact">
-            <button type="button" onClick={() => { setEditing(record.id); setConfirm(''); }} disabled={deleting}>编辑</button>
-            <button type="button" onClick={() => { setConfirm(record.id); setError(''); }} disabled={deleting}>删除</button>
-          </div>
-          {confirm === record.id && <div className="notice error" role="group" aria-label="确认删除记录">
-            <p>确定删除这条记录吗？</p>
-            <div className="actions">
-              <button type="button" className="danger" disabled={deleting} onClick={() => remove(record.id)}>
-                {deleting ? '正在删除…' : '确认删除'}
-              </button>
-              <button type="button" disabled={deleting} onClick={() => setConfirm('')}>取消</button>
-            </div>
-            <Feedback error={error} />
-          </div>}
-        </>}
-      </li>
-    ))}
-  </ul>;
+  return <li className="history-record" style={categoryStyle(record.category)}>
+    <div className="record-top">
+      <div className="record-chips">
+        <span className="category-chip"><Icon as={fields.icon} />{fields.label}</span>
+        {record.tags.map((tag) => <span key={tag} className="history-tag">{tag}</span>)}
+      </div>
+      <span className="record-duration">{formatDuration(record.minutes)}</span>
+      <button type="button" className="icon-button more-button" aria-label="更多操作" aria-haspopup="dialog"
+        onClick={() => setMode('menu')}><Icon as={Ellipsis} /></button>
+    </div>
+    {record.content && <p className="record-text">{record.content}</p>}
+    {record.gain && <div className="record-gain">
+      <p>{fields.gain}</p><div className="record-text">{record.gain}</div>
+    </div>}
+    {mode === 'menu' && <Sheet title="记录操作" onClose={close}>
+      <div className="sheet-menu">
+        <button type="button" className="text-button left-button" onClick={() => setMode('edit')}>
+          <Icon as={Pencil} />编辑</button>
+        <button type="button" className="text-button danger-text left-button" onClick={() => setMode('delete')}>
+          <Icon as={Trash2} />删除</button>
+      </div>
+    </Sheet>}
+    {mode === 'edit' && <Sheet title="编辑记录" onClose={close} busy={busy}>
+      <RecordForm key={record.id} record={record} category={record.category} date={record.record_date}
+        repository={repository} tags={tags} createTag={createTag} onPending={setBusy}
+        onSaved={() => { close(); onChange('已更新'); }} />
+    </Sheet>}
+    {mode === 'delete' && <Sheet title="删除这条记录？" onClose={close} busy={busy} center>
+      <p>删除后无法恢复。</p>
+      <Feedback error={error} />
+      <div className="confirm-actions">
+        <button type="button" disabled={busy} onClick={close}>取消</button>
+        <button type="button" className="danger" disabled={busy} onClick={remove}>{busy ? '正在删除…' : '删除'}</button>
+      </div>
+    </Sheet>}
+  </li>;
+}
+
+export function RecordList({ records, ...props }) {
+  return <ul className="records">{records.map((record) => <RecordRow key={record.id} record={record} {...props} />)}</ul>;
 }
