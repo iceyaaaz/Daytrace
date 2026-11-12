@@ -1,53 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { Icon } from '../components/DiaryUI.jsx';
+import { ActionMenu, Panel } from '../components/Panel.jsx';
 import { Feedback, QueryState } from '../components/Feedback.jsx';
 import { categories, tagCategories } from '../domain/records.js';
 import { csvFilename, recordsCsv } from '../domain/csv.js';
+import { version as appVersion } from '../../package.json';
 
-function TagGroup({ category, tags, createTag, removeTag }) {
-  const [name, setName] = useState('');
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  const [confirm, setConfirm] = useState('');
+const themes = { system: '跟随系统', light: '浅色', dark: '深色' };
 
-  async function mutate(action, success) {
-    if (pending) return;
-    setPending(true);
-    setError('');
-    setMessage('');
-    try {
-      await action();
-      setMessage(success);
-    } catch (problem) {
-      setError(problem.message);
-    } finally {
-      setPending(false);
-    }
-  }
+function Group({ label, children }) {
+  return <section className="v1-settings-section"><h2>{label}</h2><div className="v1-group">{children}</div></section>;
+}
 
-  return <section className="card" aria-label={`${categories[category].label}标签`}>
-    <h2>{categories[category].label} · {categories[category].tags}</h2>
-    <form className="tag-form" onSubmit={(event) => {
-      event.preventDefault();
-      mutate(async () => { await createTag(category, name); setName(''); }, '已新增标签');
-    }}>
-      <label htmlFor={`setting-${category}`}>新标签名称</label>
-      <div className="inline-fields">
-        <input id={`setting-${category}`} value={name} onChange={(event) => setName(event.target.value)} disabled={pending} />
-        <button className="primary" type="submit" disabled={pending}>新增</button>
-      </div>
-    </form>
-    {tags.length === 0 && <p className="muted">暂无标签。</p>}
-    <ul className="tag-list">{tags.map((tag) => <li key={tag.id}>
-      <span>{tag.name}</span>
-      {confirm === tag.id ? <div className="actions">
-        <button type="button" className="danger" disabled={pending} aria-label={`确认删除标签 ${tag.name}`}
-          onClick={() => mutate(async () => { await removeTag(tag.id); setConfirm(''); }, '已删除标签选项')}>确认删除</button>
-        <button type="button" disabled={pending} onClick={() => setConfirm('')}>取消</button>
-      </div> : <button type="button" disabled={pending} aria-label={`删除标签 ${tag.name}`} onClick={() => setConfirm(tag.id)}>删除</button>}
-    </li>)}</ul>
-    <Feedback error={error} message={message} />
-  </section>;
+function Row({ children, value, onClick }) {
+  return <button type="button" className="v1-row" onClick={onClick}>
+    <span>{children}</span><span className="v1-row-end">{value}<Icon as={ChevronRight} /></span>
+  </button>;
 }
 
 function ExportCard({ repository }) {
@@ -81,7 +50,7 @@ function ExportCard({ repository }) {
       link.remove();
       // 给 Safari 留出读取下载内容的时间。
       window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
-      setMessage(`已生成 CSV，共 ${records.length} 条记录。`);
+      setMessage(`已生成 CSV，共${records.length}条记录。`);
     } catch {
       if (!controller.signal.aborted) setError('导出失败，请检查网络或登录状态后重试。');
     } finally {
@@ -90,38 +59,71 @@ function ExportCard({ repository }) {
     }
   }
 
-  return <section className="card">
-    <h2>数据备份</h2>
-    <p className="muted">下载全部日记记录，文件可以用 Excel 打开。</p>
-    <button className="primary" type="button" onClick={exportRecords} disabled={pending}>
-      {pending ? '正在导出…' : '导出全部数据'}
+  return <Group label="数据">
+    <button className="v1-row" type="button" onClick={exportRecords} disabled={pending}>
+      {pending ? '正在导出…' : '导出全部数据（CSV）'}
     </button>
     <Feedback error={error} message={message} />
-  </section>;
+  </Group>;
 }
 
-export function Settings({ repository, tagQuery, createTag, removeTag, signOut }) {
+export function Settings({ repository, tagQuery, createTag, removeTag, signOut, theme, setTheme, onBack }) {
+  const [tagsPage, setTagsPage] = useState(false);
+  const [dialog, setDialog] = useState(null);
+  const [name, setName] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
-  return <div className="page">
-    <div className="page-heading"><div><h1>设置</h1><p className="muted">管理标签和登录状态。</p></div></div>
-    <p className="notice">删除标签选项后，历史记录和统计仍会保留该标签。</p>
-    {tagQuery.status !== 'ready' && <QueryState query={tagQuery} message="读取标签失败，请检查网络后重试。" />}
-    {tagCategories.map((category) => (
-      <TagGroup key={category} category={category} tags={(tagQuery.data ?? []).filter((tag) => tag.category === category)}
-        createTag={createTag} removeTag={removeTag} />
-    ))}
-    <ExportCard repository={repository} />
-    <section className="card">
-      <h2>账号</h2>
-      <button type="button" disabled={pending} onClick={async () => {
-        setError('');
-        setPending(true);
-        try { await signOut(); }
-        catch { setError('退出失败，请检查网络后重试。'); }
-        finally { setPending(false); }
-      }}>{pending ? '正在退出…' : '退出登录'}</button>
-      <Feedback error={error} />
-    </section>
+  const formId = useId();
+  function open(next) { setName(''); setError(''); setDialog(next); }
+  const close = () => setDialog(null);
+  async function change(action, completed = close, failure) {
+    if (pending) return;
+    setPending(true);
+    setError('');
+    try { await action(); completed(); }
+    catch (problem) { setError(failure ?? problem.message); }
+    finally { setPending(false); }
+  }
+
+  return <div className="v1-settings v1-surface">
+    <header className="v1-settings-head">
+      <button type="button" className="v1-text" onClick={tagsPage ? () => setTagsPage(false) : onBack}>‹ {tagsPage ? '设置' : '今天'}</button>
+      <h1>{tagsPage ? '标签管理' : '设置'}</h1>
+    </header>
+    {tagsPage ? <>
+      {tagQuery.status === 'loading' && <div className="v1-group v1-tag-skeleton" role="status" aria-label="正在读取标签">
+        <span className="v1-skeleton" aria-hidden="true" /><span className="v1-skeleton" aria-hidden="true" />
+      </div>}
+      {tagQuery.status === 'error' && <QueryState query={tagQuery} message="读取标签失败，请检查网络后重试。" />}
+      {tagCategories.map((category) => <Group key={category} label={categories[category].label}>
+        {(tagQuery.data ?? []).filter((tag) => tag.category === category).map((tag) =>
+          <Row key={tag.id} onClick={() => open({ type: 'delete', tag })}>{tag.name}</Row>)}
+        <button className="v1-row v1-text" type="button" onClick={() => open({ type: 'add', category })}>添加标签</button>
+      </Group>)}
+    </> : <>
+      <Group label="外观"><Row value={themes[theme]} onClick={() => open({ type: 'theme' })}>外观</Row></Group>
+      <Group label="内容"><Row onClick={() => { setTagsPage(true); window.scrollTo(0, 0); }}>标签管理</Row></Group>
+      <ExportCard repository={repository} />
+      <Group label="账号"><button className="v1-row v1-danger v1-centered" type="button" onClick={() => open({ type: 'logout' })}>退出登录</button></Group>
+      <footer className="v1-settings-version">日迹 · 版本{appVersion}</footer>
+    </>}
+    {dialog?.type === 'theme' && <ActionMenu title="外观" onCancel={close} options={Object.entries(themes).map(([value, label]) => ({
+      label, selected: theme === value, action: () => { setTheme(value); close(); },
+    }))} />}
+    {dialog?.type === 'delete' && <ActionMenu title={`删除「${dialog.tag.name}」？历史记录仍会保留这个标签。`}
+      onCancel={close} busy={pending} error={error}
+      options={[{ label: '删除标签', danger: true, action: () => change(() => removeTag(dialog.tag.id)) }]} />}
+    {dialog?.type === 'logout' && <ActionMenu title="退出登录？" onCancel={close} busy={pending} error={error}
+      options={[{ label: '退出登录', danger: true, action: () => change(signOut, close, '退出失败，请检查网络后重试。') }]} />}
+    {dialog?.type === 'add' && <Panel title="添加标签" autofocus busy={pending} onDismiss={(dismiss) => dismiss(close)}
+      submit={<button type="submit" className="v1-text" form={formId} disabled={pending || !name.trim()}>保存</button>}>
+      {(dismiss) => <form id={formId} className="v1-group v1-date-form" onSubmit={(event) => {
+        event.preventDefault();
+        change(() => createTag(dialog.category, name), () => dismiss(close));
+      }}>
+        <label>标签名称<input value={name} onChange={(event) => setName(event.target.value)} disabled={pending} /></label>
+        {error && <p className="v1-error" role="alert">{error}</p>}
+      </form>}
+    </Panel>}
   </div>;
 }

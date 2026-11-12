@@ -5,17 +5,18 @@ export const durationOptions = [
   ...Array.from({ length: 23 }, (_, i) => 60 + i * 30),
 ];
 
-export function formatDuration(minutes, { option = false } = {}) {
+export function formatDuration(minutes, { option = false, compact = false } = {}) {
   const sign = minutes < 0 ? '−' : '';
   const value = Math.abs(minutes);
-  if (value < 60) return `${sign}${value} 分钟`;
-  if (option) return `${sign}${value / 60} 小时`;
+  const gap = compact ? '' : ' ';
+  if (value < 60) return `${sign}${value}${gap}分钟`;
+  if (option) return `${sign}${value / 60}${gap}小时`;
   const remaining = value % 60;
-  return `${sign}${Math.floor(value / 60)} 小时${remaining ? ` ${remaining} 分钟` : ''}`;
+  return `${sign}${Math.floor(value / 60)}${gap}小时${remaining ? `${gap}${remaining}${gap}分钟` : ''}`;
 }
 
 export const durationText = (minutes) => formatDuration(minutes);
-export const durationOptionLabel = (minutes) => formatDuration(minutes, { option: true });
+export const durationOptionLabel = (minutes, compact = false) => formatDuration(minutes, { option: true, compact });
 
 export function durationDelta(minutes) {
   if (!minutes) return '—';
@@ -50,6 +51,6 @@ export function recordValues(draft) {
 
 export function tagName(value) {
   const name = value.trim();
-  if ([...name].length < 1 || [...name].length > 20) throw new Error('标签名称须为 1–20 个字');
+  if ([...name].length < 1 || [...name].length > 20) throw new Error('标签名称须为1–20个字');
   return name;
 }

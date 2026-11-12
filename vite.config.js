@@ -4,12 +4,14 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'node:fs';
 
 // 从样式令牌读取主题色，供网页和手机安装清单共用。
-const themeColor = readFileSync(new URL('./src/styles/tokens.css', import.meta.url), 'utf8').match(/--bg:\s*([^;]+)/)[1].trim();
+const tokens = readFileSync(new URL('./src/styles/tokens.css', import.meta.url), 'utf8');
+const themeColor = tokens.match(/--bg:\s*([^;]+)/)[1].trim();
+const darkColor = tokens.match(/--theme-dark:\s*([^;]+)/)[1].trim();
 
 export default defineConfig({
   plugins: [react(), {
     name: 'app-theme-color',
-    transformIndexHtml: (html) => html.replace('__APP_THEME_COLOR__', themeColor),
+    transformIndexHtml: (html) => html.replace('__APP_THEME_COLOR__', themeColor).replace('__APP_DARK_COLOR__', darkColor),
   }, VitePWA({
     registerType: 'autoUpdate',
     injectRegister: 'script',

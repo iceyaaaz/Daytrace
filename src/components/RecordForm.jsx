@@ -11,7 +11,7 @@ function FieldError({ id, error }) {
   return error ? <p className="field-error" id={id} role="alert">{error}</p> : null;
 }
 
-function TextField({ id, label, rows = 3, value, disabled, onChange, error, required }) {
+function TextField({ id, label, rows = 3, value, disabled, onChange, error, required, panel, placeholder }) {
   const ref = useRef(null);
   useLayoutEffect(() => {
     const field = ref.current;
@@ -20,23 +20,23 @@ function TextField({ id, label, rows = 3, value, disabled, onChange, error, requ
       const box = Number.parseFloat(styles.paddingTop) + Number.parseFloat(styles.paddingBottom);
       const line = Number.parseFloat(styles.lineHeight);
       field.style.height = 'auto';
-      const min = line * rows + box + 2;
+      const min = panel ? Number.parseFloat(styles.minHeight) : line * rows + box + 2;
       const max = line * 8 + box + 2;
       field.style.height = `${Math.max(min, Math.min(field.scrollHeight + 2, max))}px`;
     };
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
-  }, [value, rows]);
+  }, [value, rows, panel]);
   return <div className="field">
     <label htmlFor={id}>{label} <span className="muted">（{required ? '必填' : '选填'}）</span></label>
-    <textarea id={id} rows={rows} value={value ?? ''} onChange={(event) => onChange(event.target.value)} disabled={disabled}
+    <textarea id={id} rows={rows} value={value ?? ''} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} disabled={disabled}
       ref={ref} data-entry-field aria-required={required} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} />
     <FieldError id={`${id}-error`} error={error} />
   </div>;
 }
 
-function DurationField({ id, idea, value, onChange, disabled, error }) {
+function DurationField({ id, idea, value, onChange, disabled, error, panel }) {
   const [showTime, setShowTime] = useState(() => !idea || Number(value) > 0);
   const [showSelect, setShowSelect] = useState(false);
   const other = value !== '' && !shortcuts.includes(Number(value)) && (!idea || Number(value) > 0);
@@ -48,9 +48,9 @@ function DurationField({ id, idea, value, onChange, disabled, error }) {
     <div className="chips">
       {shortcuts.map((minutes, index) => <button type="button" className="chip-button" key={minutes}
         data-entry-field={index === 0 ? '' : undefined} aria-pressed={Number(value) === minutes}
-        disabled={disabled} onClick={() => choose(minutes)}><span>{durationOptionLabel(minutes)}</span></button>)}
+        disabled={disabled} onClick={() => choose(minutes)}><span>{durationOptionLabel(minutes, panel)}</span></button>)}
       {other && <button type="button" className="chip-button" aria-pressed="true" disabled={disabled}
-        onClick={() => setShowSelect(true)}><span>{durationOptionLabel(Number(value))}</span></button>}
+        onClick={() => setShowSelect(true)}><span>{durationOptionLabel(Number(value), panel)}</span></button>}
       <button type="button" className="chip-button" disabled={disabled} aria-expanded={showSelect} aria-controls={`${id}-picker`}
         onClick={() => setShowSelect((current) => !current)}><span>其他 <Icon as={ChevronDown} /></span></button>
     </div>
@@ -59,7 +59,7 @@ function DurationField({ id, idea, value, onChange, disabled, error }) {
       <select id={id} value={value} disabled={disabled} onChange={(event) => choose(event.target.value)}
         aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined}>
         <option value="" disabled hidden>请选择时长</option>
-        {durationOptions.map((minutes) => <option key={minutes} value={minutes}>{durationOptionLabel(minutes)}</option>)}
+        {durationOptions.map((minutes) => <option key={minutes} value={minutes}>{durationOptionLabel(minutes, panel)}</option>)}
       </select>
       <Icon as={ChevronDown} />
     </div>}
@@ -67,7 +67,7 @@ function DurationField({ id, idea, value, onChange, disabled, error }) {
   </fieldset>;
 }
 
-function TagPicker({ id, label, available, selected, onToggle, onAdd, disabled, error }) {
+function TagPicker({ id, label, available, selected, onToggle, onAdd, onInput, disabled, error }) {
   const [creating, setCreating] = useState(false);
   const [value, setValue] = useState('');
   const [problem, setProblem] = useState('');
@@ -86,6 +86,7 @@ function TagPicker({ id, label, available, selected, onToggle, onAdd, disabled, 
     try {
       await onAdd(value);
       setValue('');
+      onInput?.('');
       setCreating(false);
     } catch (failure) {
       setProblem(failure.message);
@@ -108,7 +109,10 @@ function TagPicker({ id, label, available, selected, onToggle, onAdd, disabled, 
     {creating && <div className="field">
       <label htmlFor={id}>新标签名称</label>
       <div className="inline-fields">
-        <input id={id} ref={input} value={value} disabled={adding || disabled} onChange={(event) => setValue(event.target.value)}
+        <input id={id} ref={input} value={value} disabled={adding || disabled} onChange={(event) => {
+          setValue(event.target.value);
+          onInput?.(event.target.value);
+        }}
           onKeyDown={(event) => {
             if (event.key !== 'Enter' || event.nativeEvent.isComposing || event.keyCode === 229) return;
             event.preventDefault();
@@ -123,7 +127,7 @@ function TagPicker({ id, label, available, selected, onToggle, onAdd, disabled, 
 }
 
 export function RecordForm({ category, record, date, tags, createTag, repository, draft: controlled, onDraft,
-  onSaved, onPending }) {
+  onSaved, onPending, panel = false, formId }) {
   const id = useId();
   const [ownDraft, setOwnDraft] = useState(() => record ?? emptyRecord(category));
   const [reset, setReset] = useState(0);
@@ -171,9 +175,12 @@ export function RecordForm({ category, record, date, tags, createTag, repository
     onSaved({ id: record?.id ?? requestId, values, again: event.nativeEvent.submitter?.value === 'again' });
   }
 
-  const content = <TextField id={`${id}-content`} label={fields.content} required={Boolean(fields.required)} rows={idea ? 4 : 3}
+  const content = <TextField id={`${id}-content`} label={fields.content} required={Boolean(fields.required)} rows={idea ? 4 : 3} panel={panel}
+    placeholder={panel && idea ? '先记下一句，留住这个念头' : undefined}
     value={draft.content} disabled={pending} onChange={(value) => update({ content: value })} error={errors.content} />;
-  return <form className="record-form" noValidate onSubmit={submit}
+  const gain = fields.gain && <TextField id={`${id}-gain`} label={fields.gain} value={draft.gain} disabled={pending} panel={panel}
+    onChange={(value) => update({ gain: value })} />;
+  return <form id={formId} className={panel ? `record-form v1-record-form ${idea ? 'v1-idea-form' : ''}` : 'record-form'} noValidate onSubmit={submit}
     style={categoryStyle(draft.category)} aria-label={record ? '编辑记录表单' : `填写${fields.label}`}>
     {error && <p role="alert" className="notice error">{error}</p>}
     {record && <div className="field">
@@ -183,24 +190,23 @@ export function RecordForm({ category, record, date, tags, createTag, repository
         {categoryIds.map((key) => <option key={key} value={key}>{categories[key].label}</option>)}
       </select><Icon as={ChevronDown} /></div>
     </div>}
-    {idea && content}
-    <DurationField key={`duration-${draft.category}-${reset}`} id={`${id}-minutes`} idea={idea} value={draft.minutes}
+    {idea && (panel ? <div className="v1-group v1-text-group">{content}</div> : content)}
+    <DurationField key={`duration-${draft.category}-${reset}`} id={`${id}-minutes`} idea={idea} value={draft.minutes} panel={panel}
       onChange={(value) => update({ minutes: value })} disabled={pending} error={errors.minutes} />
     {fields.tags && <TagPicker key={`tags-${draft.category}-${reset}`} id={`${id}-tag`}
       label={`${fields.tags}（${draft.category === 'skill' ? '至少选一个' : '选填'}）`}
       available={tags.filter((tag) => tag.category === draft.category).map((tag) => tag.name)}
       selected={draft.tags} disabled={pending} error={errors.tags}
+      onInput={panel ? (tagInput) => update({ tagInput }) : undefined}
       onToggle={(name) => update({ tags: draft.tags.includes(name) ? draft.tags.filter((tag) => tag !== name) : [...draft.tags, name] })}
       onAdd={async (value) => {
         const tag = await createTag(draft.category, value);
         update({ tags: [...new Set([...draft.tags, tag.name])] });
       }} />}
-    {!idea && content}
-    {fields.gain && <TextField id={`${id}-gain`} label={fields.gain} value={draft.gain} disabled={pending}
-      onChange={(value) => update({ gain: value })} />}
-    <div className="form-actions">
+    {!idea && (panel ? <div className="v1-group v1-text-group">{content}{gain}</div> : <>{content}{gain}</>)}
+    {!panel && <div className="form-actions">
       <button type="submit" className="primary" disabled={pending}>{pending ? '正在保存…' : '保存'}</button>
       {!record && <button type="submit" value="again" className="text-button" disabled={pending}>保存并再记一条</button>}
-    </div>
+    </div>}
   </form>;
 }

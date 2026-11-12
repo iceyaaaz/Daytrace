@@ -1,111 +1,124 @@
-import { useCallback, useId, useLayoutEffect, useReducer, useRef, useState } from 'react';
-import { Check, ChevronRight, Plus } from 'lucide-react';
-import { CategoryIcon, Collapse, DatePicker, Icon, TimeBar, useReveal } from '../components/DiaryUI.jsx';
+import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
+import { Icon, weekdayText } from '../components/DiaryUI.jsx';
+import { Panel, ActionMenu } from '../components/Panel.jsx';
 import { QueryState } from '../components/Feedback.jsx';
 import { RecordForm } from '../components/RecordForm.jsx';
 import { useQuery } from '../components/useQuery.js';
 import quotes from '../data/quotes.json';
 import { categories, categoryIds, categoryStyle } from '../domain/categories.js';
 import { isRecordDate, quoteForDate } from '../domain/dates.js';
-import { formatDuration } from '../domain/records.js';
+import { formatDuration, recordErrors } from '../domain/records.js';
+import { entryPanel, hasEntryChanges } from '../domain/entryPanel.js';
 import { minutesTotal } from '../domain/statistics.js';
-import { dayFlow, entryKey, initialToday, todayFlow } from '../domain/todayFlow.js';
 
-function EntryCard({ category, date, open, count, draft, dispatch, repository, tags, createTag, onSaved, onToggle, cards }) {
-  const id = useId();
-  const { label, subtitle } = categories[category];
-  const dirty = draft && (draft.content || draft.gain || draft.tags.length ||
-    (category === 'idea' ? Number(draft.minutes) > 0 : draft.minutes !== ''));
-  return <section className="entry-card card" style={categoryStyle(category)} data-open={open} aria-label={label}
-    ref={(node) => { cards.current[category] = node; }}>
-    <h2>
-      <button type="button" className="entry-head" aria-expanded={open} aria-controls={id} onClick={onToggle}>
-        <CategoryIcon category={category} />
-        <span className="entry-label"><strong>{label}</strong><small>{subtitle}</small></span>
-        <span className="entry-badges">
-          {count ? <span className="saved-pill"><Icon as={Check} />已记 {count} 条</span>
-            : <span className="entry-plus"><Icon as={Plus} /></span>}
-          {dirty && !open && <span className="unsaved-pill">未保存</span>}
-        </span>
-      </button>
-    </h2>
-    <Collapse id={id} open={open}>
-      <div className="entry-form">
-        <RecordForm category={category} date={date} draft={draft}
-          onDraft={(patch) => dispatch({ type: 'draft', date, category, patch })}
-          repository={repository} tags={tags} createTag={createTag} onSaved={onSaved} />
-      </div>
-    </Collapse>
-  </section>;
-}
+export const compactDuration = (minutes) => formatDuration(minutes, { compact: true });
+const dateText = (date) => `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`;
 
-export function Today({ today, repository, tags, createTag, version, onChange, navigate, active }) {
+export function Today({ today, repository, tags, createTag, version, onChange, navigate, onTitle }) {
   const [pickedDate, setPickedDate] = useState('');
-  const [state, dispatch] = useReducer(todayFlow, initialToday);
-  const [revealRequest, setRevealRequest] = useState(null);
-  const cards = useRef({});
-  const reveal = useReveal();
+  const [selectDate, setSelectDate] = useState(null);
+  const [panel, dispatch] = useReducer(entryPanel, null);
+  const [animated, setAnimated] = useState('');
+  const [saved, setSaved] = useState([]);
+  const pendingClose = useRef(null);
+  const entryForm = useId();
+  const dateForm = useId();
   const date = isRecordDate(pickedDate, today) ? pickedDate : today;
+  const title = date === today ? '今天' : dateText(date);
   const quote = quoteForDate(quotes, date);
-  const day = dayFlow(state, date);
+  const category = panel?.draft.category;
+  const focusText = category && !['skill', 'exercise'].includes(category);
   const load = useCallback((signal) => repository.listRecords({ start: date, end: date, summary: true }, signal), [date, repository]);
   const query = useQuery(load, `${date}:${version}`, { retain: true });
-  const records = query.data ?? [];
+  const base = query.data ?? [];
+  const records = [...base, ...saved.filter((item) => item.record_date === date && !base.some((row) => row.id === item.id))];
   const total = minutesTotal(records);
-  const current = useRef(null);
-  current.current = { date, open: day.open, active };
 
-  useLayoutEffect(() => {
-    if (active && revealRequest?.date === date && day.open) reveal(cards.current[day.open], true);
-    if (revealRequest) setRevealRequest(null);
-  }, [active, date, day.open, reveal, revealRequest]);
+  useEffect(() => { onTitle(title); }, [title, onTitle]);
+  useEffect(() => {
+    if (query.status === 'ready' && query.key === `${date}:${version}`) {
+      setSaved((current) => current.filter((item) => item.record_date !== date));
+    }
+  }, [date, version, query.key, query.status]);
 
-  function save(category, { id, values, again }) {
-    dispatch({ type: 'saved', date, category, again });
-    if (current.current.active && current.current.date === date && current.current.open === category) setRevealRequest({ date });
-    const time = category === 'idea' && values.minutes === 0 ? '' : ` · ${formatDuration(values.minutes)}`;
-    onChange(`已保存：${categories[category].label}${time}`, id);
+  function dismiss(close) {
+    if (hasEntryChanges(panel.draft)) {
+      pendingClose.current = close;
+      dispatch({ type: 'confirm', value: true });
+    } else close(() => dispatch({ type: 'close' }));
   }
 
-  return <div className="page">
-    <section className="quote card" aria-label="每日一言">
-      <span className="quote-mark" aria-hidden="true">“</span>
-      <p className="eyebrow">每日一言</p>
+  return <div className="v1-today v1-surface">
+    <div className="v1-large-head">
+      <h1>{title}</h1>
+      <button type="button" className="v1-icon" aria-label="设置" onClick={() => navigate('settings')}><Icon as={Settings} /></button>
+    </div>
+    <div className="v1-date-line">
+      <button className="v1-text" type="button" aria-label="记录日期" aria-haspopup="dialog" onClick={() => setSelectDate(date)}>
+        {date === today ? <time dateTime={date}>{dateText(date)} {weekdayText(date)}</time> : <span>补记 · {weekdayText(date)}</span>}
+        <Icon as={ChevronDown} />
+      </button>
+      {!!records.length && <span className={total > 1440 ? 'v1-warn' : undefined}>
+        {total <= 1440 && '· '}已记录{compactDuration(total)}{total > 1440 && '，请检查是否重复'}
+      </span>}
+      {date !== today && <button type="button" className="v1-text v1-return" onClick={() => setPickedDate('')}>回到今天</button>}
+    </div>
+    <section className="v1-quote" aria-label="每日一言">
       <blockquote>{quote.text}</blockquote>
-      {quote.author && <p className="quote-author">{quote.author}</p>}
+      {quote.author && quote.author !== '占位内容' && <p>{quote.author}</p>}
     </section>
-    <div className="today-heading">
-      <div className="page-heading">
-        <h1>今日记录</h1>
-        <DatePicker date={date} today={today} onChoose={(value) => setPickedDate(value === today ? '' : value)} />
-      </div>
-      <p className="muted">挑想记的板块，随手留下一点。</p>
+    <div className="v1-group" aria-label="日记板块">
+      {categoryIds.map((id) => {
+        const count = records.filter((item) => item.category === id).length;
+        return <button type="button" key={id} className="v1-row v1-entry-row" style={categoryStyle(id)}
+          aria-haspopup="dialog" onClick={(event) => {
+            event.currentTarget.focus({ preventScroll: true });
+            flushSync(() => dispatch({ type: 'open', category: id, id: crypto.randomUUID() }));
+          }}>
+          <span className="v1-category-icon"><Icon as={categories[id].icon} /></span><span>{categories[id].label}</span>
+          <span className="v1-row-end">
+            {query.status === 'loading' && <span className="v1-skeleton v1-skeleton-count" aria-hidden="true" />}
+            {count > 0 && <span key={count} className={animated === id ? 'v1-count v1-bounce' : 'v1-count'}>{count}</span>}
+            <Icon as={ChevronRight} />
+          </span>
+        </button>;
+      })}
     </div>
-    <QueryState query={query}>
-      <section className="card time-card" aria-label="今日时间条">
-        <TimeBar records={records} total={total} daily />
-        <div className="time-caption">
-          <strong>{records.length ? `已记录 ${formatDuration(total)}` : '今天还没有记录'}</strong>
-          {total <= 1440 && <small>未记录 {formatDuration(1440 - total)}</small>}
-          {total > 1440 && <p role="alert" className="warning">合计超过 24 小时，请检查是否重复记录</p>}
-        </div>
-      </section>
-    </QueryState>
-    <div className="page" key={date}>
-      {categoryIds.map((category) => <div className="entry-group" key={category}>
-        {category === 'fun_offline' && <p className="group-caption">娱乐</p>}
-        <EntryCard category={category} date={date} open={day.open === category}
-          count={records.filter((record) => record.category === category).length}
-          draft={state.drafts[entryKey(date, category)]} cards={cards} dispatch={dispatch}
-          repository={repository} tags={tags} createTag={createTag} onSaved={(saved) => save(category, saved)}
-          onToggle={() => {
-            if (day.open !== category) setRevealRequest({ date });
-            dispatch({ type: 'toggle', date, category });
-          }} />
-      </div>)}
-    </div>
-    {day.finished && <button type="button" className="text-button finish-link" onClick={() => navigate('history')}>
-      {date === today ? '今天' : '当天'}已记录 {records.length} 条 · 去历史查看 <Icon as={ChevronRight} />
-    </button>}
+    {query.status === 'error' && <QueryState query={query} />}
+    {selectDate !== null && <Panel title="记录日期" onDismiss={(close) => close(() => setSelectDate(null))}
+      submit={<button type="submit" className="v1-text" form={dateForm} disabled={!isRecordDate(selectDate, today)}>确定</button>}>
+      {(close) => <form className="v1-group v1-date-form" id={dateForm} onSubmit={(event) => {
+        event.preventDefault();
+        if (isRecordDate(selectDate, today)) close(() => { setPickedDate(selectDate === today ? '' : selectDate); setSelectDate(null); });
+      }}><label>选择日期<input type="date" required min="0001-01-01" max={today} value={selectDate}
+        onChange={(event) => setSelectDate(event.target.value)} /></label></form>}
+    </Panel>}
+    {panel && <Panel title={categories[category].label} onDismiss={dismiss} busy={panel.busy} autofocus={Boolean(focusText)}
+      submit={<button type="submit" className="v1-text v1-save" form={entryForm} disabled={panel.busy}
+        data-incomplete={Boolean(Object.keys(recordErrors(panel.draft)).length)}>{panel.busy ? '保存中…' : '保存'}</button>}
+      footer={<button type="submit" form={entryForm} value="again" className="v1-text" disabled={panel.busy}>保存并再记一条</button>}>
+      {(close) => <RecordForm panel formId={entryForm} category={category} date={date} tags={tags}
+        createTag={createTag} repository={repository} draft={panel.draft}
+        onPending={(value) => dispatch({ type: 'busy', value, id: panel.id })}
+        onDraft={(patch) => dispatch({ type: 'patch', patch, id: panel.id })}
+        onSaved={({ id, values, again }) => {
+          setSaved((current) => [...current, { id, record_date: date, ...values }]);
+          setAnimated(category);
+          const message = `已保存：${categories[category].label}${values.minutes ? ` · ${compactDuration(values.minutes)}` : ''}`;
+          onChange(message, id);
+          if (again) {
+            dispatch({ type: 'again' });
+            requestAnimationFrame(() => document.getElementById(entryForm)?.querySelector('textarea')?.focus());
+          } else close(() => dispatch({ type: 'close' }));
+        }} />}
+    </Panel>}
+    {panel?.confirming && <ActionMenu title="放弃未保存的更改？" cancel="继续编辑"
+      onCancel={() => dispatch({ type: 'confirm', value: false })}
+      options={[{ label: '放弃更改', danger: true, action: () => {
+        dispatch({ type: 'confirm', value: false });
+        pendingClose.current?.(() => dispatch({ type: 'close' }));
+      } }]} />}
   </div>;
 }

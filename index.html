@@ -4,7 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="日迹是一款中文时间日记。随手记录灵感、阅读、学习与运动，再用统计和周报回看时间花在了哪里。" />
-    <meta name="theme-color" content="__APP_THEME_COLOR__" />
+    <meta name="theme-color" data-theme-color="light" media="(prefers-color-scheme: light)" content="__APP_THEME_COLOR__" />
+    <meta name="theme-color" data-theme-color="dark" media="(prefers-color-scheme: dark)" content="__APP_DARK_COLOR__" />
+    <script>
+      (() => {
+        let theme;
+        try { theme = localStorage.getItem('daytrace-theme'); } catch {}
+        const root = document.documentElement;
+        if (theme === 'light' || theme === 'dark') {
+          root.dataset.theme = theme;
+          document.querySelectorAll('meta[data-theme-color]').forEach((meta) => {
+            meta.media = meta.dataset.themeColor === theme ? 'all' : 'not all';
+          });
+        }
+        root.dataset.effectiveTheme = root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      })();
+    </script>
     <meta name="apple-mobile-web-app-title" content="日迹" />
     <link rel="icon" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
