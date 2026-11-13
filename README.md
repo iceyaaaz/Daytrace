@@ -9,7 +9,7 @@
 - **回顾**：按周、月或全部查看时间分配。点柱子看单日或单月明细，点「学习技能」看标签用时。
 - **手机使用与备份**：可把网页添加到手机主屏幕。使用同一账号可在不同设备查看记录，并在设置中导出 CSV。
 
-[使用说明](使用说明.md) · [部署与备份](docs/部署与备份.md) · [历次界面截图](docs/evidence/) · [版本标签](https://github.com/iceyaaaz/Daytrace/tags)
+[使用说明](使用说明.md) · [部署与备份](docs/部署与备份.md) · [历次界面截图](docs/evidence/) · [版本更新日志](CHANGELOG.md) · [版本标签](https://github.com/iceyaaaz/Daytrace/tags)
 
 ## 项目结构
 
