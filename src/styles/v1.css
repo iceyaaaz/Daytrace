@@ -1,6 +1,14 @@
 :root { text-autospace: no-autospace; font-variant-numeric: normal; }
 
-.v1-main { padding-top: calc(env(safe-area-inset-top) + var(--space-5)); padding-bottom: calc(var(--v-bottom-safe) + var(--space-6)); }
+.v1-main {
+  width: 100%;
+  max-width: var(--shell);
+  min-width: 0;
+  padding-inline: max(var(--space-4), env(safe-area-inset-left)) max(var(--space-4), env(safe-area-inset-right));
+  padding-top: calc(env(safe-area-inset-top) + var(--space-5));
+  padding-bottom: calc(var(--v-bottom-safe) + var(--space-6));
+}
+.v1-main > div, .v1-today > .v1-group, .v1-review-shell > div { min-width: 0; max-width: 100%; }
 .v1-main[data-settings="true"] {
   padding-top: var(--v-top-safe); padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-6));
   overflow-x: clip;
@@ -34,7 +42,7 @@
   font-size: var(--v-large); line-height: var(--v-large-line); font-weight: var(--v-heavy);
 }
 .v1-history-shell { --top-inset: var(--v-top-safe); }
-.v1-review-shell { display: grid; gap: var(--space-3); }
+.v1-review-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
 .v1-segments {
   display: grid; grid-template-columns: repeat(2, 1fr); padding: 0 var(--space-1);
   border-radius: var(--v-segment-radius); background: var(--fill);
@@ -71,6 +79,8 @@
 .v1-row-end { display: flex; align-items: center; margin-inline-start: auto; gap: var(--space-2); color: var(--text-3); }
 .v1-row-end svg.lucide, .v1-date-line svg.lucide { width: var(--v-small-icon); height: var(--v-small-icon); }
 .v1-entry-row { min-height: var(--v-row); justify-content: flex-start; gap: var(--space-3); }
+.v1-entry-row > :nth-child(2) { min-width: 0; }
+.v1-entry-row > .v1-row-end { flex: none; }
 .v1-entry-row:not(:last-child)::after { inset-inline-start: calc(var(--space-4) + var(--v-category-size) + var(--space-3)); }
 .v1-category-icon {
   display: grid; place-items: center; flex: none; width: var(--v-category-size); height: var(--v-category-size);
@@ -89,8 +99,13 @@
 .v1-date-line button:first-child { padding-inline: 0; color: var(--text-2); }
 .v1-return { margin-inline-start: auto; }
 .v1-warn { color: var(--warn); }
-.v1-quote { margin: var(--space-5) 0 var(--space-6); }
-.v1-quote blockquote { margin: 0; font: var(--v-quote)/var(--v-quote-line) var(--font-quote); }
+.v1-quote { margin: var(--space-6) 0 var(--space-8); }
+.v1-quote blockquote {
+  margin: 0;
+  color: var(--text-2);
+  font: var(--weight-normal) var(--v-quote)/var(--v-quote-line) var(--font-quote);
+  overflow-wrap: anywhere;
+}
 .v1-quote p { margin-top: var(--space-2); font-size: var(--small-size); color: var(--text-3); }
 .v1-toast-region { position: fixed; z-index: 4; inset: auto 0 calc(var(--v-bottom-safe) + var(--space-3)); pointer-events: none; }
 .v1-toast {
