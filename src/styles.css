@@ -39,7 +39,7 @@ button {
 }
 button:disabled { opacity: .55; cursor: default; }
 :focus-visible { outline: var(--focus-line) solid var(--brand); outline-offset: var(--focus-line); }
-button.primary, button.danger { color: var(--surface); font-weight: var(--weight-strong); }
+button.primary, button.danger { color: var(--on-brand); font-weight: var(--weight-strong); }
 button.primary { background: var(--brand); border-color: var(--brand); }
 button.primary:active:not(:disabled) { background: var(--brand-hover); }
 button.danger { background: var(--danger); border-color: var(--danger); }
@@ -64,7 +64,7 @@ input:not([type="checkbox"]), select, textarea {
 input::placeholder, textarea::placeholder { color: var(--text-3); }
 input:not([type="checkbox"]):focus, select:focus, textarea:focus {
   border-color: var(--brand);
-  box-shadow: 0 0 0 var(--accent-line) var(--brand-soft);
+  box-shadow: var(--focus-shadow);
 }
 textarea { resize: none; }
 label { display: block; }
@@ -94,7 +94,7 @@ label { display: block; }
   padding-top: env(safe-area-inset-top);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   backdrop-filter: blur(var(--space-3));
-  box-shadow: 0 var(--line) var(--border);
+  box-shadow: var(--topbar-shadow);
 }
 .topbar .shell, .brand { display: flex; align-items: center; gap: var(--space-2); }
 .topbar .shell { justify-content: space-between; height: var(--top); }
@@ -202,7 +202,7 @@ button[aria-current="page"], .filters button[aria-pressed="true"] {
 .group-caption { margin-bottom: var(--space-2); font-size: var(--small-size); line-height: var(--small-line); color: var(--text-2); }
 .entry-card { padding: 0; scroll-margin-top: calc(var(--top-inset) + var(--space-2)); }
 .entry-card { overflow: hidden; }
-.entry-card[data-open="true"] { box-shadow: inset var(--accent-line) 0 var(--category), var(--shadow); }
+.entry-card[data-open="true"] { box-shadow: var(--entry-shadow); }
 .entry-head {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -215,7 +215,7 @@ button[aria-current="page"], .filters button[aria-pressed="true"] {
   text-align: start;
 }
 .entry-head:focus-visible { outline-offset: calc(-1 * var(--space-1)); }
-.entry-card[data-open="true"] .entry-head { background: color-mix(in srgb, var(--category-soft) 40%, transparent); border-end-start-radius: 0; border-end-end-radius: 0; }
+.entry-card[data-open="true"] .entry-head { background: color-mix(in srgb, var(--category-soft) 40%, transparent); border-end-start-radius: var(--radius-none); border-end-end-radius: var(--radius-none); }
 .category-icon {
   display: grid;
   place-items: center;

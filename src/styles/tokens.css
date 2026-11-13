@@ -1,28 +1,7 @@
 :root {
-  --bg: #F7F4EE;
-  --surface: #FFFFFF;
-  --surface-2: #FBF9F5;
-  --border: #E9E3D8;
-  --border-strong: #D9D1C3;
-  --text: #1F2421;
-  --text-2: #5F6661;
-  --text-3: #606862;
-  --brand: #1F4D3F;
-  --brand-hover: #173D32;
-  --brand-soft: #E4EFEA;
-  --danger: #C0392B;
-  --danger-soft: #FBE9E7;
-  --warn-soft: #FFF3DA;
-  --idea: #E3A63F; --idea-soft: #FFF3DA; --idea-text: #7A4B00;
-  --book: #5B73B8; --book-soft: #E8ECFC; --book-text: #243A9B;
-  --skill: #4E9F8F; --skill-soft: #DDF4EA; --skill-text: #0B6A4B;
-  --exercise: #D9795C; --exercise-soft: #FDE7E1; --exercise-text: #A33A22;
-  --news: #7E8FA6; --news-soft: #DDF1F6; --news-text: #0F5F72;
-  --fun-offline: #C9709B; --fun-offline-soft: #FBE4F0; --fun-offline-text: #8F2A60;
-  --fun-phone: #9079C4; --fun-phone-soft: #EEE6FB; --fun-phone-text: #5230A0;
   --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
   --space-5: 20px; --space-6: 24px; --space-8: 32px;
-  --radius-card: 16px; --radius-control: 12px; --radius-sheet: 20px; --radius-pill: 999px;
+  --radius-card: var(--r-card); --radius-control: var(--r-control); --radius-none: 0; --radius-pill: 999px;
   --title-size: 24px; --title-line: 32px;
   --card-size: 17px; --card-line: 24px;
   --body-size: 15px; --body-line: 22px;
@@ -44,72 +23,33 @@
   --scrim: rgb(31 36 33 / .42);
   --motion: 160ms; --expand: 240ms; --ease: cubic-bezier(.2,.8,.2,1);
   --chart-height: 278px;
-  --theme-dark: #141513;
-  --fill: #ECE7DE;
-  --hairline: #E4DED3;
-  --accent: #1F4D3F;
-  --warn: #985707;
-  --on-brand: #FFFFFF;
-  --v-icon-ink: #FFFFFF;
-  --v-overlay: rgb(0 0 0 / .35);
-  --v-group-border: var(--hairline);
   --v-toast-shadow: 0 4px 16px rgb(0 0 0 / .12);
-  --v-glass: color-mix(in srgb, var(--bg) 80%, transparent);
-  --v-error-fill: color-mix(in srgb, var(--danger) 10%, var(--surface));
-  --v-hair: .5px; --v-row: 56px; --v-min-row: 52px; --v-nav: 49px;
+  --focus-shadow: 0 0 0 var(--accent-line) var(--brand-soft);
+  --topbar-shadow: 0 var(--line) var(--border);
+  --entry-shadow: inset var(--accent-line) 0 var(--category), var(--shadow);
+  --v-hair: var(--hairline-w); --v-row: 56px; --v-min-row: 52px; --v-nav: 49px;
   --v-top: 44px; --v-large: 32px; --v-large-line: 38px; --v-heavy: 700;
   --v-heading: 17px; --v-heading-line: 22px; --v-body: 15px; --v-body-line: 20px;
   --v-quote: 17px; --v-quote-line: 28px; --v-tab-size: 11px;
-  --v-group-radius: 12px; --v-panel-radius: 16px; --v-menu-radius: 14px;
+  --v-group-radius: var(--r-card); --v-panel-radius: 16px; --v-menu-radius: 14px;
   --v-segment-radius: 9px; --v-segment-thumb: 7px;
-  --v-category-size: 28px; --v-category-radius: 7px; --v-category-glyph: 18px;
+  --v-category-size: 28px; --category-square-radius: 7px; --v-category-glyph: 18px;
   --v-small-icon: 14px; --v-settings-icon: 22px; --v-control: 50px;
   --v-handle-width: 36px; --v-handle-height: 5px; --v-panel-width: 520px;
   --v-input-min: 96px; --v-idea-min: 120px; --v-blur: 20px;
   --v-panel-motion: 320ms; --v-press-motion: 120ms; --v-bounce-motion: 200ms;
   --v-panel-ease: cubic-bezier(.32,.72,0,1);
-  --v-search-mark: color-mix(in srgb, var(--brand) 14%, var(--surface));
-  --v2-on-delete: var(--on-brand);
   --v2-overview-size: 34px; --v2-overview-line: 40px;
   --v2-swipe-width: 72px; --v2-chart-height: 180px; --v2-axis-size: 12px;
   --v2-chart-label-row: 22px; --v2-month-col: 20px; --v2-rank-bar: 3px; --v2-chart-motion: 400ms;
+  --theme-motion: 240ms; --welcome-fade: 400ms;
+  --theme-hero-height: 168px; --theme-slide-height: 380px; --theme-tile-height: 150px;
+  --theme-band-height: 30px; --theme-welcome-band-height: 64px;
+  --theme-selected-border: 2px solid var(--brand);
   --v-top-safe: calc(var(--v-top) + env(safe-area-inset-top));
   --v-bottom-safe: calc(var(--v-nav) + env(safe-area-inset-bottom));
 }
 
-:root[data-effective-theme="dark"] {
-  color-scheme: dark;
-  --bg: var(--theme-dark);
-  --surface: #1E201D;
-  --surface-2: #2A2D29;
-  --fill: #2A2D29;
-  --hairline: #353830;
-  --border: var(--hairline);
-  --border-strong: #53594F;
-  --text: #F2F1EC;
-  --text-2: #B4B8B1;
-  --text-3: #979C94;
-  --brand: #3E7F66;
-  --brand-hover: #326852;
-  --brand-soft: #2D463A;
-  --accent: #8CCBAE;
-  --danger: #FF6B5E;
-  --danger-soft: #3D2925;
-  --warn: #E3A63F;
-  --warn-soft: #382F20;
-  --v-icon-ink: var(--theme-dark);
-  --v2-on-delete: var(--theme-dark);
-  --v-overlay: rgb(0 0 0 / .55);
-  --v-group-border: transparent;
-  --idea: #F0B955;
-  --book: #7C93D6;
-  --skill: #6BBFAC;
-  --exercise: #E8937A;
-  --news: #9BAAC0;
-  --fun-offline: #DE8DB3;
-  --fun-phone: #A995DA;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  :root { --motion: 0ms; --expand: 0ms; --v-panel-motion: 0ms; --v-press-motion: 0ms; --v-bounce-motion: 0ms; --v2-chart-motion: 0ms; }
+  :root { --motion: 0ms; --expand: 0ms; --v-panel-motion: 0ms; --v-press-motion: 0ms; --v-bounce-motion: 0ms; --v2-chart-motion: 0ms; --theme-motion: 0ms; --welcome-fade: 0ms; }
 }

@@ -1,3 +1,5 @@
+import { ThemePicker } from '../themes/ThemeViews.jsx';
+import { modeLabels } from '../themes/index.js';
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Icon } from '../components/DiaryUI.jsx';
@@ -7,15 +9,13 @@ import { categories, tagCategories } from '../domain/records.js';
 import { csvFilename, recordsCsv } from '../domain/csv.js';
 import { version as appVersion } from '../../package.json';
 
-const themes = { system: '跟随系统', light: '浅色', dark: '深色' };
-
 function Group({ label, children }) {
   return <section className="v1-settings-section"><h2>{label}</h2><div className="v1-group">{children}</div></section>;
 }
 
-function Row({ children, value, onClick }) {
-  return <button type="button" className="v1-row" onClick={onClick}>
-    <span>{children}</span><span className="v1-row-end">{value}<Icon as={ChevronRight} /></span>
+function Row({ children, value, onClick, disabled }) {
+  return <button type="button" className="v1-row" onClick={onClick} disabled={disabled}>
+    <span>{children}</span><span className="v1-row-end">{value}{!disabled && <Icon as={ChevronRight} />}</span>
   </button>;
 }
 
@@ -67,7 +67,9 @@ function ExportCard({ repository }) {
   </Group>;
 }
 
-export function Settings({ repository, tagQuery, createTag, removeTag, signOut, theme, setTheme, onBack }) {
+export function Settings({ repository, tagQuery, createTag, removeTag, signOut, appearance, onBack }) {
+  const [themePage, setThemePage] = useState(false);
+  const fixedMode = appearance.theme.modes.length === 1;
   const [tagsPage, setTagsPage] = useState(false);
   const [dialog, setDialog] = useState(null);
   const [name, setName] = useState('');
@@ -87,10 +89,10 @@ export function Settings({ repository, tagQuery, createTag, removeTag, signOut, 
 
   return <div className="v1-settings v1-surface">
     <header className="v1-settings-head">
-      <button type="button" className="v1-text" onClick={tagsPage ? () => setTagsPage(false) : onBack}>‹ {tagsPage ? '设置' : '今天'}</button>
-      <h1>{tagsPage ? '标签管理' : '设置'}</h1>
+      <button type="button" className="v1-text" onClick={themePage ? () => setThemePage(false) : tagsPage ? () => setTagsPage(false) : onBack}>‹ {tagsPage || themePage ? '设置' : '今天'}</button>
+      {!themePage && <h1>{tagsPage ? '标签管理' : '设置'}</h1>}
     </header>
-    {tagsPage ? <>
+    {themePage ? <ThemePicker appearance={appearance} /> : tagsPage ? <>
       {tagQuery.status === 'loading' && <div className="v1-group v1-tag-skeleton" role="status" aria-label="正在读取标签">
         <span className="v1-skeleton" aria-hidden="true" /><span className="v1-skeleton" aria-hidden="true" />
       </div>}
@@ -101,14 +103,19 @@ export function Settings({ repository, tagQuery, createTag, removeTag, signOut, 
         <button className="v1-row v1-text" type="button" onClick={() => open({ type: 'add', category })}>添加标签</button>
       </Group>)}
     </> : <>
-      <Group label="外观"><Row value={themes[theme]} onClick={() => open({ type: 'theme' })}>外观</Row></Group>
+      <Group label="外观">
+        <Row value={<><span className="theme-dot" aria-hidden="true" />{appearance.theme.name}</>}
+          onClick={() => { setThemePage(true); window.scrollTo(0, 0); }}>主题</Row>
+        <Row disabled={fixedMode} value={fixedMode ? '该主题仅有' + modeLabels[appearance.mode] + '版本' : modeLabels[appearance.preference]}
+          onClick={() => open({ type: 'mode' })}>明暗</Row>
+      </Group>
       <Group label="内容"><Row onClick={() => { setTagsPage(true); window.scrollTo(0, 0); }}>标签管理</Row></Group>
       <ExportCard repository={repository} />
       <Group label="账号"><button className="v1-row v1-danger v1-centered" type="button" onClick={() => open({ type: 'logout' })}>退出登录</button></Group>
       <footer className="v1-settings-version">日迹 · 版本{appVersion}</footer>
     </>}
-    {dialog?.type === 'theme' && <ActionMenu title="外观" onCancel={close} options={Object.entries(themes).map(([value, label]) => ({
-      label, selected: theme === value, action: () => { setTheme(value); close(); },
+    {dialog?.type === 'mode' && <ActionMenu title="明暗" onCancel={close} options={Object.entries(modeLabels).map(([value, label]) => ({
+      label, selected: appearance.preference === value, action: () => { appearance.setPreference(value); close(); },
     }))} />}
     {dialog?.type === 'delete' && <ActionMenu title={`删除「${dialog.tag.name}」？历史记录仍会保留这个标签。`}
       onCancel={close} busy={pending} error={error}

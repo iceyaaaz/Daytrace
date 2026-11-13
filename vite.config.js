@@ -3,15 +3,13 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'node:fs';
 
-// 从样式令牌读取主题色，供网页和手机安装清单共用。
-const tokens = readFileSync(new URL('./src/styles/tokens.css', import.meta.url), 'utf8');
-const themeColor = tokens.match(/--bg:\s*([^;]+)/)[1].trim();
-const darkColor = tokens.match(/--theme-dark:\s*([^;]+)/)[1].trim();
+import { themeBoot } from './src/themes/boot.js';
+const { script, themeColor } = themeBoot(readFileSync(new URL('./src/themes/palettes.css', import.meta.url), 'utf8'));
 
 export default defineConfig({
   plugins: [react(), {
     name: 'app-theme-color',
-    transformIndexHtml: (html) => html.replace('__APP_THEME_COLOR__', themeColor).replace('__APP_DARK_COLOR__', darkColor),
+    transformIndexHtml: (html) => html.replace('__APP_THEME_COLOR__', themeColor).replace('__APP_THEME_BOOT__', () => script),
   }, VitePWA({
     registerType: 'autoUpdate',
     injectRegister: 'script',
@@ -24,6 +22,7 @@ export default defineConfig({
     },
     workbox: {
       globPatterns: ['**/*.{html,js,css,png,webmanifest}'],
+      globIgnores: ['**/BeastHero-*.js'],
       skipWaiting: true,
       clientsClaim: true,
       navigateFallback: null,
@@ -33,6 +32,10 @@ export default defineConfig({
         urlPattern: ({ request, sameOrigin }) => sameOrigin && request.mode === 'navigate',
         handler: 'NetworkOnly',
         options: { precacheFallback: { fallbackURL: '/index.html' } },
+      }, {
+        urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/BeastHero-[\w-]+\.js$/.test(url.pathname),
+        handler: 'CacheFirst',
+        options: { cacheName: 'daytrace-theme-art', expiration: { maxEntries: 4 } },
       }],
     },
   })],

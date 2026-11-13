@@ -12,7 +12,7 @@
 .v2-day + .v2-day { border-top: var(--v-hair) solid var(--hairline); }
 .v2-day-button, .v2-record-body, .v2-category-row {
   width: 100%; justify-content: flex-start; text-align: start; border: 0;
-  border-radius: 0; padding-inline: var(--space-4); min-width: 0;
+  border-radius: var(--radius-none); padding-inline: var(--space-4); min-width: 0;
 }
 .v2-day-button {
   min-height: var(--v-min-row); gap: var(--space-2); font-size: var(--v-heading);
@@ -44,7 +44,7 @@
 .v2-record-body mark { background: var(--v-search-mark); color: inherit; }
 .v2-swipe-actions { position: absolute; inset: 0 0 0 auto; display: flex; }
 .v2-swipe-actions button {
-  width: var(--v2-swipe-width); min-height: var(--tap); border: 0; border-radius: 0;
+  width: var(--v2-swipe-width); min-height: var(--tap); border: 0; border-radius: var(--radius-none);
   padding: var(--space-1); color: var(--on-brand); background: var(--brand);
 }
 .v2-swipe-actions button:last-child { color: var(--v2-on-delete); background: var(--danger); }
@@ -56,7 +56,7 @@
 }
 .v2-search svg { flex: none; width: var(--icon-small); height: var(--icon-small); }
 .v2-search input[type="search"] { min-height: var(--tap); min-width: 0; border: 0; background: transparent; padding: 0; }
-.v2-search input::placeholder { color: var(--text-3); }
+.v2-search input::placeholder { color: var(--text-2); }
 .v2-search input:focus-visible { outline-offset: 0; }
 .v2-more { justify-self: center; }
 .v2-empty {
@@ -100,7 +100,7 @@
 .v2-stack {
   position: absolute; inset: auto 0 0; margin-inline: auto; display: flex; flex-direction: column-reverse;
   width: min(72%, var(--v-category-size)); height: var(--height); overflow: hidden;
-  border-radius: var(--space-1) var(--space-1) 0 0;
+  border-radius: var(--space-1) var(--space-1) var(--radius-none) var(--radius-none);
   transform-origin: bottom; animation: v2-grow var(--v2-chart-motion) var(--ease);
   transition: opacity var(--v-press-motion); cursor: pointer;
 }

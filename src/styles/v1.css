@@ -52,12 +52,12 @@
 .v1-icon { width: var(--tap); padding: 0; color: var(--text-2); }
 .v1-icon svg.lucide { width: var(--v-settings-icon); height: var(--v-settings-icon); }
 .v1-group {
-  min-width: 0; background: var(--surface); border: var(--v-hair) solid var(--v-group-border);
-  border-radius: var(--v-group-radius);
+  min-width: 0; background: var(--surface); border: var(--card-border);
+  border-radius: var(--v-group-radius); box-shadow: var(--card-shadow);
 }
 .v1-row {
   width: 100%; min-height: var(--v-min-row); display: flex; justify-content: space-between; text-align: start;
-  padding: var(--space-2) var(--space-4); position: relative; border: 0; border-radius: 0;
+  padding: var(--space-2) var(--space-4); position: relative; border: 0; border-radius: var(--radius-none);
   font-size: var(--v-heading); line-height: var(--v-heading-line); overflow-wrap: anywhere;
   transition: background-color var(--v-press-motion);
 }
@@ -82,7 +82,7 @@
 .v1-entry-row:not(:last-child)::after { inset-inline-start: calc(var(--space-4) + var(--v-category-size) + var(--space-3)); }
 .v1-category-icon {
   display: grid; place-items: center; flex: none; width: var(--v-category-size); height: var(--v-category-size);
-  border-radius: var(--v-category-radius); color: var(--v-icon-ink); background: var(--category);
+  border-radius: var(--category-radius); color: var(--on-cat); background: var(--category);
 }
 .v1-category-icon svg.lucide { width: var(--v-category-glyph); height: var(--v-category-glyph); }
 .v1-count { font-variant-numeric: tabular-nums; }
@@ -132,7 +132,7 @@
 .v1-dialog {
   position: fixed; inset: auto 0 var(--viewport-bottom, 0px); margin: 0 auto;
   width: 100%; max-width: none; max-height: min(92dvh, calc(var(--viewport-height, 100dvh) - env(safe-area-inset-top)));
-  padding: 0; border: 0; border-radius: var(--v-panel-radius) var(--v-panel-radius) 0 0;
+  padding: 0; border: 0; border-radius: var(--v-panel-radius) var(--v-panel-radius) var(--radius-none) var(--radius-none);
   background: var(--bg); color: var(--text); overflow: hidden;
   translate: 0 var(--drag-y, 0px);
 }
@@ -170,9 +170,9 @@
 .v1-text-group .field { padding: var(--space-3) var(--space-4); }
 .v1-text-group .field + .field { border-top: var(--v-hair) solid var(--hairline); }
 .v1-text-group label, .v1-record-form legend { color: var(--text-2); font-size: var(--small-size); line-height: var(--small-line); }
-.v1-record-form textarea { min-height: var(--v-input-min); border: 0; border-radius: 0; background: transparent; padding: 0; }
+.v1-record-form textarea { min-height: var(--v-input-min); border: 0; border-radius: var(--radius-none); background: transparent; padding: 0; }
 .v1-idea-form textarea { min-height: var(--v-idea-min); }
-.v1-record-form .chip-field { padding: var(--space-2) var(--space-4); background: var(--surface); border-radius: var(--v-group-radius); border: var(--v-hair) solid var(--v-group-border); }
+.v1-record-form .chip-field { padding: var(--space-2) var(--space-4); background: var(--surface); border-radius: var(--v-group-radius); border: var(--card-border); }
 .v1-record-form .chip-field legend { float: left; width: 100%; margin-bottom: var(--space-1); }
 .v1-record-form .chips { clear: both; }
 .v1-record-form .chip-button > span { background: var(--fill); border: 0; color: var(--text); font-size: var(--v-body); }
@@ -181,7 +181,7 @@
 .v1-dialog :is(textarea,input:not([type="checkbox"]),select):focus { box-shadow: none; border-color: transparent; outline: none; }
 :root[data-v1-keyboard="true"] .v1-dialog :is(textarea,input:not([type="checkbox"]),select):focus { outline: var(--focus-line) solid var(--accent); outline-offset: 0; }
 .v1-dialog button:focus-visible, .v1-surface button:focus-visible, .v1-nav button:focus-visible { outline-color: var(--accent); }
-.login-card { box-shadow: none; border: var(--v-hair) solid var(--v-group-border); border-radius: var(--v-group-radius); }
+.login-card { box-shadow: none; border: var(--card-border); border-radius: var(--v-group-radius); }
 .login-card .primary { color: var(--on-brand); }
 
 @media (min-width: 641px) {

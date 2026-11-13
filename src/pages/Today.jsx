@@ -1,3 +1,4 @@
+import { ThemeHero } from '../themes/ThemeViews.jsx';
 import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { ChevronDown, ChevronRight, Settings } from 'lucide-react';
@@ -16,7 +17,7 @@ import { minutesTotal } from '../domain/statistics.js';
 export const compactDuration = (minutes) => formatDuration(minutes, { compact: true });
 const dateText = (date) => `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`;
 
-export function Today({ today, repository, tags, createTag, version, onChange, navigate, onTitle }) {
+export function Today({ today, repository, tags, createTag, version, onChange, navigate, onTitle, theme }) {
   const [pickedDate, setPickedDate] = useState('');
   const [selectDate, setSelectDate] = useState(null);
   const [panel, dispatch] = useReducer(entryPanel, null);
@@ -51,19 +52,22 @@ export function Today({ today, repository, tags, createTag, version, onChange, n
   }
 
   return <div className="v1-today v1-surface">
-    <div className="v1-large-head">
-      <h1>{title}</h1>
-      <button type="button" className="v1-icon" aria-label="设置" onClick={() => navigate('settings')}><Icon as={Settings} /></button>
-    </div>
-    <div className="v1-date-line">
-      <button className="v1-text" type="button" aria-label="记录日期" aria-haspopup="dialog" onClick={() => setSelectDate(date)}>
-        {date === today ? <time dateTime={date}>{dateText(date)} {weekdayText(date)}</time> : <span>补记 · {weekdayText(date)}</span>}
-        <Icon as={ChevronDown} />
-      </button>
-      {!!records.length && <span className={total > 1440 ? 'v1-warn' : undefined}>
-        {total <= 1440 && '· '}已记录{compactDuration(total)}{total > 1440 && '，请检查是否重复'}
-      </span>}
-      {date !== today && <button type="button" className="v1-text v1-return" onClick={() => setPickedDate('')}>回到今天</button>}
+    <div className="theme-today-head" data-illustrated={theme.kind === 'style'}>
+      <ThemeHero theme={theme} />
+      <div className="v1-large-head">
+        <h1>{title}</h1>
+        <button type="button" className="v1-icon" aria-label="设置" onClick={() => navigate('settings')}><Icon as={Settings} /></button>
+      </div>
+      <div className="v1-date-line">
+        <button className="v1-text" type="button" aria-label="记录日期" aria-haspopup="dialog" onClick={() => setSelectDate(date)}>
+          {date === today ? <time dateTime={date}>{dateText(date)} {weekdayText(date)}</time> : <span>补记 · {weekdayText(date)}</span>}
+          <Icon as={ChevronDown} />
+        </button>
+        {!!records.length && <span className={total > 1440 ? 'v1-warn' : undefined}>
+          {total <= 1440 && '· '}已记录{compactDuration(total)}{total > 1440 && '，请检查是否重复'}
+        </span>}
+        {date !== today && <button type="button" className="v1-text v1-return" onClick={() => setPickedDate('')}>回到今天</button>}
+      </div>
     </div>
     <section className="v1-quote" aria-label="每日一言">
       <blockquote>{quote.text}</blockquote>

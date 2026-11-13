@@ -1,3 +1,5 @@
+import { useAppearance } from './themes/ThemeProvider.jsx';
+import { Welcome } from './themes/ThemeViews.jsx';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, ChartNoAxesColumn, Check, SquarePen } from 'lucide-react';
 import { Icon } from './components/DiaryUI.jsx';
@@ -14,17 +16,6 @@ import { Review } from './pages/Review.jsx';
 import { Today } from './pages/Today.jsx';
 
 const tabs = [['today', '今日', SquarePen], ['history', '历史', CalendarDays], ['review', '回顾', ChartNoAxesColumn]];
-
-function applyTheme(theme) {
-  if (theme === 'system') delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = theme;
-  document.documentElement.dataset.effectiveTheme = theme === 'system'
-    ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
-  for (const meta of document.querySelectorAll('meta[data-theme-color]')) {
-    const mode = meta.dataset.themeColor;
-    meta.media = theme === 'system' ? `(prefers-color-scheme: ${mode})` : theme === mode ? 'all' : 'not all';
-  }
-}
 
 function Login({ client }) {
   const [email, setEmail] = useState('');
@@ -69,7 +60,7 @@ function Login({ client }) {
   </main>;
 }
 
-function Diary({ client }) {
+function Diary({ client, appearance }) {
   const repository = useMemo(() => createRepository(client), [client]);
   const [page, setPage] = useState('today');
   const [today, setToday] = useState(() => localDate());
@@ -77,7 +68,6 @@ function Diary({ client }) {
   const [tagVersion, setTagVersion] = useState(0);
   const [historyVisited, setHistoryVisited] = useState(false);
   const [reviewVisited, setReviewVisited] = useState(false);
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? 'system');
   const [todayTitle, setTodayTitle] = useState('今天');
   const [scrolled, setScrolled] = useState(false);
   const positions = useRef({});
@@ -100,12 +90,6 @@ function Diary({ client }) {
     const timer = setTimeout(() => setToast((current) => current === toast ? null : current), toast.duration);
     return () => clearTimeout(timer);
   }, [toast]);
-
-  function updateTheme(value) {
-    applyTheme(value);
-    try { localStorage.setItem('daytrace-theme', value); } catch { /* 本次会话仍生效 */ }
-    setTheme(value);
-  }
 
   function navigate(next) {
     if (next === page) return;
@@ -187,11 +171,11 @@ function Diary({ client }) {
     <main className="shell v1-main" ref={content} data-settings={page === 'settings'}>
       {['today', 'history'].includes(page) && tagQuery.status === 'error' &&
         <QueryState query={tagQuery} message="读取标签失败，请检查网络后重试。" />}
-      <div hidden={page !== 'today'} data-active={page === 'today'}><Today {...props} onTitle={setTodayTitle} /></div>
+      <div hidden={page !== 'today'} data-active={page === 'today'}><Today {...props} theme={appearance.theme} onTitle={setTodayTitle} /></div>
       {historyVisited && <div className="v1-history-shell" hidden={page !== 'history'} data-active={page === 'history'}><History {...props} /></div>}
       {reviewVisited && <div className="v1-review-shell" hidden={page !== 'review'} data-active={page === 'review'}><Review {...props} /></div>}
       {page === 'settings' && <Settings repository={repository} tagQuery={tagQuery} createTag={createTag} removeTag={removeTag}
-        signOut={signOut} theme={theme} setTheme={updateTheme} onBack={() => navigate('today')} />}
+        signOut={signOut} appearance={appearance} onBack={() => navigate('today')} />}
     </main>
     {page !== 'settings' && <nav className="v1-nav" aria-label="主导航"><div className="shell">
       {tabs.map(([id, label, graphic]) => <button key={id} type="button" aria-current={page === id ? 'page' : undefined}
@@ -207,15 +191,13 @@ function Diary({ client }) {
 }
 
 export default function App() {
+  const appearance = useAppearance();
   const [session, setSession] = useState(undefined);
   useEffect(() => {
-    const media = matchMedia('(prefers-color-scheme: dark)');
-    const sync = () => applyTheme(document.documentElement.dataset.theme ?? 'system');
     const keyboard = (event) => {
       if (event.key === 'Tab') document.documentElement.dataset.v1Keyboard = 'true';
     };
     const pointer = () => delete document.documentElement.dataset.v1Keyboard;
-    media.addEventListener('change', sync);
     window.addEventListener('keydown', keyboard, true);
     window.addEventListener('pointerdown', pointer, true);
     return () => {
@@ -231,5 +213,6 @@ export default function App() {
   }, []);
   if (!supabase || session === null) return <Login client={supabase} />;
   if (session === undefined) return <main className="login-layout"><p role="status">正在检查登录状态…</p></main>;
-  return <Diary key={session.user.id} client={supabase} />;
+  if (!appearance.welcomeSeen) return <Welcome appearance={appearance} />;
+  return <Diary key={session.user.id} client={supabase} appearance={appearance} />;
 }

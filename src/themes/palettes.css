@@ -1,0 +1,355 @@
+[data-mode="light"] {
+  color-scheme: light;
+  --v-overlay: rgb(0 0 0 / .35);
+  --v2-on-delete: var(--on-brand);
+  --on-brand: #FFFFFF;
+  --on-cat: #FFFFFF;
+  --c-idea: #E3A63F;
+  --c-book: #5B73B8;
+  --c-skill: #4E9F8F;
+  --c-exercise: #D9795C;
+  --c-news: #7E8FA6;
+  --c-fun-offline: #C9709B;
+  --c-fun-phone: #9079C4;
+  --r-card: 12px;
+  --r-control: 12px;
+  --hairline-w: 0.5px;
+  --glow: none;
+  --card-border: var(--hairline-w) solid var(--hairline);
+  --card-shadow: none;
+}
+
+[data-mode="dark"] {
+  color-scheme: dark;
+  --v-overlay: rgb(0 0 0 / .55);
+  --v2-on-delete: #141513;
+  --on-brand: #FFFFFF;
+  --on-cat: #141513;
+  --c-idea: #F0B955;
+  --c-book: #7C93D6;
+  --c-skill: #6BBFAC;
+  --c-exercise: #E8937A;
+  --c-news: #9BAAC0;
+  --c-fun-offline: #DE8DB3;
+  --c-fun-phone: #A995DA;
+  --r-card: 12px;
+  --r-control: 12px;
+  --hairline-w: 0.5px;
+  --glow: none;
+  --card-border: none;
+  --card-shadow: none;
+}
+
+[data-theme="paper"][data-mode="light"] {
+  --bg: #F7F4EE;
+  --surface: #FFFFFF;
+  --fill: #ECE7DE;
+  --hairline: #E4DED3;
+  --text: #1F2421;
+  --text-2: #5F6661;
+  --text-3: #6A716C;
+  --brand: #1F4D3F;
+  --accent: #1F4D3F;
+  --danger: #C0392B;
+  --warn: #A8650A;
+  --surface-2: #FBF9F5;
+  --border-strong: #D9D1C3;
+  --brand-soft: #E4EFEA;
+}
+
+[data-theme="paper"][data-mode="dark"] {
+  --bg: #141513;
+  --surface: #1E201D;
+  --fill: #2A2D29;
+  --hairline: #353830;
+  --text: #F2F1EC;
+  --text-2: #B4B8B1;
+  --text-3: #8F948C;
+  --brand: #3E7F66;
+  --accent: #8CCBAE;
+  --danger: #FF6B5E;
+  --warn: #E3A63F;
+  --surface-2: #2A2D29;
+  --border-strong: #53594F;
+  --brand-soft: #2D463A;
+}
+
+[data-theme="mist"][data-mode="light"] {
+  --bg: #EEF2F6;
+  --surface: #FFFFFF;
+  --fill: #E1E8F0;
+  --hairline: #D5DEE8;
+  --text: #1B2733;
+  --text-2: #4A5B6C;
+  --text-3: #576A7D;
+  --brand: #2F5F8F;
+  --accent: #2F5F8F;
+  --danger: #B3382A;
+  --warn: #8A5A0A;
+}
+
+[data-theme="mist"][data-mode="dark"] {
+  --bg: #10161D;
+  --surface: #18212B;
+  --fill: #223040;
+  --hairline: #2C3B4D;
+  --text: #E8EEF4;
+  --text-2: #B3C0CE;
+  --text-3: #8D9DB0;
+  --brand: #3B72A6;
+  --accent: #8FC0EE;
+  --danger: #FF7A6B;
+  --warn: #E3A63F;
+}
+
+[data-theme="oat"][data-mode="light"] {
+  --bg: #F4ECE1;
+  --surface: #FFFAF3;
+  --fill: #EADFCE;
+  --hairline: #DFD1BB;
+  --text: #2E2119;
+  --text-2: #5E4A3B;
+  --text-3: #75604F;
+  --brand: #6B4A32;
+  --accent: #6B4A32;
+  --danger: #B3382A;
+  --warn: #8A5A0A;
+}
+
+[data-theme="blush"][data-mode="light"] {
+  --bg: #FBEFF1;
+  --surface: #FFFFFF;
+  --fill: #F4DDE2;
+  --hairline: #EBCDD4;
+  --text: #3A2229;
+  --text-2: #6A4651;
+  --text-3: #7F5C68;
+  --brand: #A3405F;
+  --accent: #A3405F;
+  --danger: #B3382A;
+  --warn: #8A5A0A;
+}
+
+[data-theme="ink"][data-mode="dark"] {
+  --bg: #0E0E0F;
+  --surface: #1A1A1C;
+  --fill: #26262A;
+  --hairline: #333338;
+  --text: #F1F1F2;
+  --text-2: #B8B8BD;
+  --text-3: #909096;
+  --brand: #F1F1F2;
+  --on-brand: #0E0E0F;
+  --accent: #F1F1F2;
+  --danger: #FF6B5E;
+  --warn: #E3A63F;
+}
+
+[data-theme="beast"][data-mode="light"] {
+  --bg: #FBEFD9;
+  --surface: #FFF8EA;
+  --fill: #F3E2C4;
+  --hairline: #E6D2AE;
+  --text: #4A2F1B;
+  --text-2: #6B4F37;
+  --text-3: #836449;
+  --brand: #8A4B1F;
+  --accent: #8A4B1F;
+  --danger: #B3382A;
+  --warn: #9A5A0A;
+  --c-idea: #E9A23B;
+  --c-book: #8670B5;
+  --c-skill: #7FA26B;
+  --c-exercise: #D9714F;
+  --c-news: #5FA8A0;
+  --c-fun-offline: #C9708A;
+  --c-fun-phone: #6B86B8;
+  --r-card: 16px;
+  --r-control: 12px;
+}
+
+[data-theme="beast"][data-mode="dark"] {
+  --bg: #1F1812;
+  --surface: #2A2118;
+  --fill: #382D20;
+  --hairline: #3D3224;
+  --text: #F6E9D5;
+  --text-2: #D3BFA3;
+  --text-3: #B49E82;
+  --brand: #A8581F;
+  --accent: #F0B070;
+  --danger: #FF8A7A;
+  --warn: #F2B957;
+  --c-idea: #F2B957;
+  --c-book: #A18BD0;
+  --c-skill: #9CC287;
+  --c-exercise: #E8896A;
+  --c-news: #7EC2BA;
+  --c-fun-offline: #DE8CA3;
+  --c-fun-phone: #8AA3D2;
+  --r-card: 16px;
+  --r-control: 12px;
+}
+
+[data-theme="forest"][data-mode="light"] {
+  --bg: #E9F0E4;
+  --surface: #F7FAF4;
+  --fill: #DCE8D5;
+  --hairline: #CFDDC6;
+  --text: #1F3A2A;
+  --text-2: #46604F;
+  --text-3: #526B5A;
+  --brand: #2F6B4A;
+  --accent: #2F6B4A;
+  --danger: #B3382A;
+  --warn: #8A5A0A;
+  --c-idea: #D6A23A;
+  --c-book: #5F7FB0;
+  --c-skill: #4E9A6F;
+  --c-exercise: #D3744F;
+  --c-news: #6FA3A8;
+  --c-fun-offline: #C26F8E;
+  --c-fun-phone: #8C78B8;
+  --r-card: 14px;
+  --r-control: 12px;
+}
+
+[data-theme="forest"][data-mode="dark"] {
+  --bg: #101A14;
+  --surface: #18261D;
+  --fill: #223326;
+  --hairline: #2B3E30;
+  --text: #E6F1E3;
+  --text-2: #B7CDB8;
+  --text-3: #93AD96;
+  --brand: #3E7F5A;
+  --accent: #8FD3A8;
+  --danger: #FF8A7A;
+  --warn: #E8BB5E;
+  --c-idea: #E8BB5E;
+  --c-book: #8CA7D6;
+  --c-skill: #74BE92;
+  --c-exercise: #E58E6B;
+  --c-news: #8CC1C4;
+  --c-fun-offline: #D98BA8;
+  --c-fun-phone: #A895D3;
+  --r-card: 14px;
+  --r-control: 12px;
+}
+
+[data-theme="neon"][data-mode="dark"] {
+  --bg: #0B0F1E;
+  --surface: #141A33;
+  --fill: #1D2547;
+  --hairline: #2A3566;
+  --text: #E6F6FF;
+  --text-2: #A9C4E0;
+  --text-3: #8097BC;
+  --brand: #1FE3FF;
+  --on-brand: #0B0F1E;
+  --accent: #5CF0FF;
+  --danger: #FF6B7A;
+  --warn: #FFC83D;
+  --c-idea: #FFC83D;
+  --c-book: #6C8CFF;
+  --c-skill: #2BE3A5;
+  --c-exercise: #FF7A59;
+  --c-news: #1FE3FF;
+  --c-fun-offline: #FF3DCB;
+  --c-fun-phone: #B28CFF;
+  --on-cat: #0B0F1E;
+  --r-card: 6px;
+  --r-control: 6px;
+  --glow: 0 0 8px rgba(31,227,255,.55);
+  --card-border: 1px solid var(--hairline);
+}
+
+[data-theme="candy"][data-mode="light"] {
+  --bg: #FFEAF3;
+  --surface: #FFFFFF;
+  --fill: #F9DDEB;
+  --hairline: #F3CFE0;
+  --text: #4A2F5C;
+  --text-2: #6E4F82;
+  --text-3: #77578F;
+  --brand: #7B4FC4;
+  --accent: #7B4FC4;
+  --danger: #C2335A;
+  --warn: #9A5A0A;
+  --c-idea: #F5A524;
+  --c-book: #6F7CF0;
+  --c-skill: #3FBF9A;
+  --c-exercise: #FF7D6B;
+  --c-news: #4DB6E8;
+  --c-fun-offline: #FF6FAF;
+  --c-fun-phone: #A27BF0;
+  --r-card: 20px;
+  --r-control: 14px;
+}
+
+[data-theme="candy"][data-mode="dark"] {
+  --bg: #1A1230;
+  --surface: #241A40;
+  --fill: #30245A;
+  --hairline: #3B2D6B;
+  --text: #F5ECFF;
+  --text-2: #CDB9EA;
+  --text-3: #A892D0;
+  --brand: #7F4FD6;
+  --accent: #C9A8FF;
+  --danger: #FF8FA3;
+  --warn: #FFC75A;
+  --c-idea: #FFC75A;
+  --c-book: #8D98FF;
+  --c-skill: #5FD9B5;
+  --c-exercise: #FF9A8A;
+  --c-news: #6CC9F2;
+  --c-fun-offline: #FF8FC4;
+  --c-fun-phone: #BC9BFF;
+  --r-card: 20px;
+  --r-control: 14px;
+}
+
+[data-theme="blocks"][data-mode="light"] {
+  --bg: #FFF9EC;
+  --surface: #FFFFFF;
+  --fill: #F6ECD3;
+  --hairline: #111111;
+  --text: #111111;
+  --text-2: #3D3D3D;
+  --text-3: #5C5C5C;
+  --brand: #2F5BFF;
+  --accent: #2F5BFF;
+  --danger: #D1243B;
+  --warn: #8F5B00;
+  --c-idea: #FFC83D;
+  --c-book: #5B8CFF;
+  --c-skill: #12A06C;
+  --c-exercise: #FF5A36;
+  --c-news: #00A3E0;
+  --c-fun-offline: #FF6F91;
+  --c-fun-phone: #8B5CF6;
+  --on-cat: #111111;
+  --r-card: 4px;
+  --r-control: 4px;
+  --hairline-w: 1px;
+  --card-border: 1.5px solid #111111;
+  --card-shadow: 3px 3px 0 #111111;
+}
+
+/* Derived colors resolve in each preview and in the live theme. */
+[data-mode] {
+  --category-radius: var(--category-square-radius);
+  --surface-2: color-mix(in srgb, var(--surface) 65%, var(--bg));
+  --border: var(--hairline);
+  --border-strong: color-mix(in srgb, var(--hairline) 80%, var(--text-3));
+  --brand-hover: color-mix(in srgb, var(--brand) 92%, var(--on-brand));
+  --brand-soft: color-mix(in srgb, var(--brand) 12%, var(--surface));
+  --danger-soft: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  --warn-soft: color-mix(in srgb, var(--warn) 12%, var(--surface));
+  --v-glass: color-mix(in srgb, var(--bg) 80%, transparent);
+  --v-error-fill: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  --v-search-mark: color-mix(in srgb, var(--brand) 14%, var(--surface));
+}
+
+[data-theme="beast"] { --category-radius: var(--radius-pill); }
