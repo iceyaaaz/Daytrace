@@ -40,8 +40,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // 将图表渲染和 Supabase 客户端分别打包，便于浏览器复用缓存。
-          if (id.includes('/node_modules/zrender/')) return 'chart-renderer';
           if (id.includes('/node_modules/@supabase/')) return 'supabase-client';
         },
       },

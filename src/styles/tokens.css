@@ -68,6 +68,11 @@
   --v-input-min: 96px; --v-idea-min: 120px; --v-blur: 20px;
   --v-panel-motion: 320ms; --v-press-motion: 120ms; --v-bounce-motion: 200ms;
   --v-panel-ease: cubic-bezier(.32,.72,0,1);
+  --v-search-mark: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  --v2-on-delete: var(--on-brand);
+  --v2-overview-size: 34px; --v2-overview-line: 40px;
+  --v2-swipe-width: 72px; --v2-chart-height: 180px; --v2-axis-size: 12px;
+  --v2-chart-label-row: 22px; --v2-month-col: 20px; --v2-rank-bar: 3px; --v2-chart-motion: 400ms;
   --v-top-safe: calc(var(--v-top) + env(safe-area-inset-top));
   --v-bottom-safe: calc(var(--v-nav) + env(safe-area-inset-bottom));
 }
@@ -93,6 +98,7 @@
   --warn: #E3A63F;
   --warn-soft: #382F20;
   --v-icon-ink: var(--theme-dark);
+  --v2-on-delete: var(--theme-dark);
   --v-overlay: rgb(0 0 0 / .55);
   --v-group-border: transparent;
   --idea: #F0B955;
@@ -105,5 +111,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root { --motion: 0ms; --expand: 0ms; --v-panel-motion: 0ms; --v-press-motion: 0ms; --v-bounce-motion: 0ms; }
+  :root { --motion: 0ms; --expand: 0ms; --v-panel-motion: 0ms; --v-press-motion: 0ms; --v-bounce-motion: 0ms; --v2-chart-motion: 0ms; }
 }

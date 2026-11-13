@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { addDays, isRecordDate, localDate, quoteForDate, statsRange, weekRange } from '../src/domain/dates.js';
-import { categoryIds, durationDelta, durationOptionLabel, durationOptions, emptyRecord, formatDuration, recordValues, tagName } from '../src/domain/records.js';
-import { minutesTotal, summarize, withWeekComparison } from '../src/domain/statistics.js';
+import { addDays, isRecordDate, localDate, quoteForDate, weekRange } from '../src/domain/dates.js';
+import { categoryIds, durationOptionLabel, durationOptions, emptyRecord, formatDuration, recordValues, tagName } from '../src/domain/records.js';
+import { minutesTotal, summarize } from '../src/domain/statistics.js';
 
 const entry = (record_date, category, minutes, tags = []) => ({ record_date, category, minutes, tags });
 
@@ -30,9 +30,6 @@ test('T-12：完整 35 档与时长文字', () => {
   assert.equal(durationOptions.at(-1), 720);
   assert.equal(durationOptionLabel(55), '55 分钟');
   assert.equal(durationOptionLabel(90), '1.5 小时');
-  assert.equal(durationDelta(125), '▲ 2 小时 5 分钟');
-  assert.equal(durationDelta(-30), '▼ 30 分钟');
-  assert.equal(durationDelta(0), '—');
   assert.deepEqual([0, 5, 55, 60, 80, 90, 720].map((minutes) => formatDuration(minutes)), [
     '0 分钟', '5 分钟', '55 分钟', '1 小时', '1 小时 20 分钟', '1 小时 30 分钟', '12 小时',
   ]);
@@ -62,21 +59,12 @@ test('T-16、T-22：合计可超过 24 小时，标签去掉两端空白并限�
   assert.throws(() => tagName('  '));
 });
 
-test('T-31：四个时间范围都按自然日，21 条跨月数据和独立手算一致', () => {
-  const today = '2026-11-10';
-  const fixtures = Array.from({ length: 21 }, (_, index) => entry(addDays(today, -2 * index), 'book', 5));
-  const expected = { '7': 20, '30': 75, month: 25, all: 105 };
-  for (const [period, total] of Object.entries(expected)) assert.equal(summarize(fixtures, statsRange(period, today)).total, total);
-});
-
-test('T-32、T-33、T-34：显示占比合计 100%，缺失日为空，标签各计入完整时长', () => {
+test('T-33、T-34：缺失日为空，标签各计入完整时长', () => {
   const result = summarize([
     entry('2026-11-08', 'book', 30), entry('2026-11-08', 'idea', 30),
     entry('2026-11-10', 'skill', 30, ['Python', '数据分析']), entry('2026-11-10', 'idea', 0),
   ], { start: '2026-11-08', end: '2026-11-10' });
   assert.equal(result.total, 90);
-  assert.equal(result.breakdown.length, 7);
-  assert.equal(result.breakdown.reduce((total, item) => total + item.tenths, 0), 1000);
   assert.equal(result.days[0].minutes.book, 30);
   assert.deepEqual(result.days[1], { date: '2026-11-09', minutes: null });
   assert.deepEqual(result.tags.map((tag) => tag.minutes), [30, 30]);
@@ -84,13 +72,11 @@ test('T-32、T-33、T-34：显示占比合计 100%，缺失日为空，标签各
   assert.equal(summarize([entry('2026-11-10', 'idea', 0)], {}).total, 0);
 });
 
-test('T-35：周日属于上一周的周一范围，比较只计本周减上周', () => {
+test('T-35：周日属于上一周的周一范围', () => {
   assert.deepEqual(weekRange('2026-11-08'), { start: '2026-11-02', end: '2026-11-08' });
   assert.deepEqual(weekRange('2026-11-09'), { start: '2026-11-09', end: '2026-11-15' });
   const entries = [entry('2026-11-08', 'book', 60), entry('2026-11-09', 'book', 30), entry('2026-11-15', 'idea', 0)];
   const current = summarize(entries, weekRange('2026-11-09'));
-  const previous = summarize(entries, weekRange('2026-11-08'));
   assert.equal(current.recordedDays, 2);
   assert.equal(current.days.length, 7);
-  assert.equal(withWeekComparison(current, previous).find((row) => row.category === 'book').delta, -30);
 });

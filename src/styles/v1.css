@@ -8,7 +8,7 @@
   padding-top: calc(env(safe-area-inset-top) + var(--space-5));
   padding-bottom: calc(var(--v-bottom-safe) + var(--space-6));
 }
-.v1-main > div, .v1-today > .v1-group, .v1-review-shell > div { min-width: 0; max-width: 100%; }
+.v1-main > div, .v1-today > .v1-group { min-width: 0; max-width: 100%; }
 .v1-main[data-settings="true"] {
   padding-top: var(--v-top-safe); padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-6));
   overflow-x: clip;
@@ -38,11 +38,9 @@
 }
 .v1-nav button[aria-current="page"] { color: var(--accent); background: transparent; }
 .v1-large-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-.v1-large-head h1, .v1-history-shell .history-heading h1, .v1-review-shell > h1 {
+.v1-large-head h1 {
   font-size: var(--v-large); line-height: var(--v-large-line); font-weight: var(--v-heavy);
 }
-.v1-history-shell { --top-inset: var(--v-top-safe); }
-.v1-review-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
 .v1-segments {
   display: grid; grid-template-columns: repeat(2, 1fr); padding: 0 var(--space-1);
   border-radius: var(--v-segment-radius); background: var(--fill);

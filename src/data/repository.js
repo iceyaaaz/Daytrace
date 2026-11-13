@@ -26,6 +26,26 @@ export function createRepository(client) {
     }
   }
 
+  async function searchRecords(keyword, page = 0, signal) {
+    const term = keyword.trim();
+    if (!term) return { records: [], more: false };
+    const pageSize = 30;
+    const start = page * pageSize;
+    let query = client.rpc('search_records', { keyword: term }).select(recordColumns)
+      .order('record_date', { ascending: false }).order('id').range(start, start + pageSize);
+    if (signal) query = query.abortSignal(signal);
+    const { data, error } = await query;
+    if (error) throw error;
+    return { records: data.slice(0, pageSize), more: data.length > pageSize };
+  }
+
+  async function hasRecordsBefore(date, signal) {
+    const { data, error } = await client.from('records').select('id')
+      .lt('record_date', date).limit(1).abortSignal(signal);
+    if (error) throw error;
+    return data.length > 0;
+  }
+
   async function saveRecord(id, draftId, date, values) {
     const records = client.from('records');
     const query = id
@@ -67,5 +87,5 @@ export function createRepository(client) {
     if (error) throw error;
   }
 
-  return { listRecords, saveRecord, deleteRecord, listTags, createTag, deleteTag };
+  return { listRecords, searchRecords, hasRecordsBefore, saveRecord, deleteRecord, listTags, createTag, deleteTag };
 }

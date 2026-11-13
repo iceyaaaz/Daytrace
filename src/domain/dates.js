@@ -26,11 +26,6 @@ export function weekRange(date) {
   return { start, end: addDays(start, 6) };
 }
 
-export function statsRange(period, today) {
-  const starts = { '7': addDays(today, -6), '30': addDays(today, -29), month: `${today.slice(0, 7)}-01` };
-  return { start: starts[period], end: today };
-}
-
 export function quoteForDate(quotes, date) {
   // 先确定本地日期，再以 UTC 的日历标尺计算天数差。
   const days = Math.round((Date.parse(`${date}T00:00:00Z`) - Date.UTC(2020, 0, 1)) / 86_400_000);

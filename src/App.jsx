@@ -10,7 +10,7 @@ import { tagName } from './domain/records.js';
 import { toastAfterUndo } from './domain/todayFlow.js';
 import { History } from './pages/History.jsx';
 import { Settings } from './pages/Settings.jsx';
-import { Stats, Weekly } from './pages/Stats.jsx';
+import { Review } from './pages/Review.jsx';
 import { Today } from './pages/Today.jsx';
 
 const tabs = [['today', '今日', SquarePen], ['history', '历史', CalendarDays], ['review', '回顾', ChartNoAxesColumn]];
@@ -77,8 +77,6 @@ function Diary({ client }) {
   const [tagVersion, setTagVersion] = useState(0);
   const [historyVisited, setHistoryVisited] = useState(false);
   const [reviewVisited, setReviewVisited] = useState(false);
-  const [weeklyVisited, setWeeklyVisited] = useState(false);
-  const [review, setReview] = useState('stats');
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? 'system');
   const [todayTitle, setTodayTitle] = useState('今天');
   const [scrolled, setScrolled] = useState(false);
@@ -191,15 +189,7 @@ function Diary({ client }) {
         <QueryState query={tagQuery} message="读取标签失败，请检查网络后重试。" />}
       <div hidden={page !== 'today'} data-active={page === 'today'}><Today {...props} onTitle={setTodayTitle} /></div>
       {historyVisited && <div className="v1-history-shell" hidden={page !== 'history'} data-active={page === 'history'}><History {...props} /></div>}
-      {reviewVisited && <div className="v1-review-shell" hidden={page !== 'review'} data-active={page === 'review'}>
-        <h1>回顾</h1>
-        <div className="v1-segments" role="group" aria-label="回顾视图">
-          <button type="button" aria-pressed={review === 'stats'} onClick={() => setReview('stats')}>统计</button>
-          <button type="button" aria-pressed={review === 'weekly'} onClick={() => { setWeeklyVisited(true); setReview('weekly'); }}>周报</button>
-        </div>
-        <div hidden={review !== 'stats'}><Stats {...props} theme={theme} /></div>
-        {weeklyVisited && <div hidden={review !== 'weekly'}><Weekly {...props} theme={theme} /></div>}
-      </div>}
+      {reviewVisited && <div className="v1-review-shell" hidden={page !== 'review'} data-active={page === 'review'}><Review {...props} /></div>}
       {page === 'settings' && <Settings repository={repository} tagQuery={tagQuery} createTag={createTag} removeTag={removeTag}
         signOut={signOut} theme={theme} setTheme={updateTheme} onBack={() => navigate('today')} />}
     </main>

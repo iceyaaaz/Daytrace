@@ -1,6 +1,6 @@
 {
   "name": "daytrace",
-  "version": "2.2.0-v1.1",
+  "version": "2.2.0-v2",
   "description": "日迹，记录时间与成长的中文日记应用",
   "private": true,
   "type": "module",
@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",
-    "echarts": "^6.0.0",
     "lucide-react": "1.71.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

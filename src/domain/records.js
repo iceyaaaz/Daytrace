@@ -18,11 +18,6 @@ export function formatDuration(minutes, { option = false, compact = false } = {}
 export const durationText = (minutes) => formatDuration(minutes);
 export const durationOptionLabel = (minutes, compact = false) => formatDuration(minutes, { option: true, compact });
 
-export function durationDelta(minutes) {
-  if (!minutes) return '—';
-  return `${minutes > 0 ? '▲' : '▼'} ${formatDuration(Math.abs(minutes))}`;
-}
-
 export function emptyRecord(category) {
   return { category, minutes: category === 'idea' ? 0 : '', tags: [], content: '', gain: '' };
 }
