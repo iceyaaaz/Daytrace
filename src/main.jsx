@@ -4,5 +4,6 @@ import './styles.css';
 import './styles/v1.css';
 import './styles/v2.css';
 import './themes/theme.css';
+import './styles/x1.css';
 
 createRoot(document.getElementById('root')).render(<App />);

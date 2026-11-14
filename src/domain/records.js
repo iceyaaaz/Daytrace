@@ -5,18 +5,17 @@ export const durationOptions = [
   ...Array.from({ length: 23 }, (_, i) => 60 + i * 30),
 ];
 
-export function formatDuration(minutes, { option = false, compact = false } = {}) {
+export function formatDuration(minutes, { option = false } = {}) {
   const sign = minutes < 0 ? '−' : '';
   const value = Math.abs(minutes);
-  const gap = compact ? '' : ' ';
-  if (value < 60) return `${sign}${value}${gap}分钟`;
-  if (option) return `${sign}${value / 60}${gap}小时`;
+  if (value < 60) return `${sign}${value}分钟`;
+  if (option) return `${sign}${value / 60}小时`;
   const remaining = value % 60;
-  return `${sign}${Math.floor(value / 60)}${gap}小时${remaining ? `${gap}${remaining}${gap}分钟` : ''}`;
+  return `${sign}${Math.floor(value / 60)}小时${remaining ? `${remaining}分钟` : ''}`;
 }
 
 export const durationText = (minutes) => formatDuration(minutes);
-export const durationOptionLabel = (minutes, compact = false) => formatDuration(minutes, { option: true, compact });
+export const durationOptionLabel = (minutes) => formatDuration(minutes, { option: true });
 
 export function emptyRecord(category) {
   return { category, minutes: category === 'idea' ? 0 : '', tags: [], content: '', gain: '' };

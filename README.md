@@ -56,4 +56,31 @@ npm run build
 
 ## 素材与许可
 
-兽主题的小猫、脚印和主题预览由本项目按设计草图绘制，使用原创 SVG 和 CSS。图标沿用项目现有的 Lucide 线性图标（ISC 许可证），文字使用系统字体。界面素材没有引入第三方图片、字体文件或插画。
+兽主题的小猫、脚印、登录场景、纯色主题的稿纸书签、云雾、拉花、花瓣和星点，以及相应的主题预览与动效，均由本项目用原创 SVG 和 CSS 绘制。图标沿用项目现有的 Lucide 线性图标（ISC 许可证），文字使用系统字体。界面素材没有引入第三方图片、字体文件或插画。
+
+
+## 交互与动效验收
+
+设置 → 外观 → 动效可选「跟随系统」「开启」「关闭」。选择只记在当前浏览器。默认跟随系统的「减少动态效果」。
+
+以下两项只在本地开发（`npm run dev`）和 Vercel Preview 环境生效（预览构建需要 Vercel 提供 `VITE_VERCEL_ENV=preview`）。正式站忽略这些键。请用测试账号和虚构数据。
+
+第 1 步：打开预览或本地开发网页，按 F12，在「控制台」输入以下一行并回车，页面会刷新。把 `happy` 换成 `idle`（打盹）、`active`（醒着）、`happy`（开心）或 `sleep`（睡着），在兽主题的今日页查看。
+
+```js
+localStorage.setItem('riji.debug.mascot', 'happy'); location.reload();
+```
+
+第 2 步：光影覆盖可用 `morning`、`day`、`dusk`、`night`。X1 读取此设置，实际光影画面从 X2 开始接入。
+
+```js
+localStorage.setItem('riji.debug.tod', 'dusk'); location.reload();
+```
+
+第 3 步：验收后在同一处输入下面一行恢复自动判断。
+
+```js
+localStorage.removeItem('riji.debug.mascot'); localStorage.removeItem('riji.debug.tod'); location.reload();
+```
+
+[查看 X1 验收与截图](docs/X1验收.md)

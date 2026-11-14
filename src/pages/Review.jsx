@@ -1,3 +1,4 @@
+import { formatMonthDay as monthDay } from '../domain/dates.js';
 import { formatDuration } from '../domain/records.js';
 import { useCallback, useId, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChartNoAxesColumn } from 'lucide-react';
@@ -10,7 +11,6 @@ import { dailyAverage, percentage, reviewBuckets, reviewCategories, reviewRange,
 import { summarize } from '../domain/statistics.js';
 
 const views = [['week', '周'], ['month', '月'], ['all', '全部']];
-const monthDay = (date) => `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`;
 
 function Period({ view, range, offset, onOffset }) {
   const week = view === 'week';
@@ -82,7 +82,7 @@ export function Review({ today, repository, version }) {
     const average = formatDuration(dailyAverage(summary.total, days));
     const description = view === 'week'
       ? `${days}/7 天有记录 · ${weekComparison(summary.total, previous.total, previous.recordedDays)}`
-      : `${view === 'month' ? `${days}/${buckets.length} 天有记录` : `共 ${days} 天有记录`} · 日均 ${average}`;
+      : `${view === 'month' ? `${days}/${buckets.length}天有记录` : `共${days}天有记录`} · 日均${average}`;
     return { summary, buckets, rows, description };
   }, [data, range, today, view]);
 

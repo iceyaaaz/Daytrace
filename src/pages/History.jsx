@@ -5,13 +5,12 @@ import { QueryState } from '../components/Feedback.jsx';
 import { HistoryEditor, HistoryRecord } from '../components/HistoryRecord.jsx';
 import { Panel } from '../components/Panel.jsx';
 import { useQuery } from '../components/useQuery.js';
-import { addDays, isRecordDate } from '../domain/dates.js';
+import { addDays, formatMonthDay as dayLabel, isRecordDate } from '../domain/dates.js';
 import { groupMonths } from '../domain/history.js';
 import { formatDuration } from '../domain/records.js';
 import { shiftMonth } from '../domain/review.js';
 import { minutesTotal } from '../domain/statistics.js';
 
-const dayLabel = (date) => `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`;
 const monthLabel = (month) => `${Number(month.slice(0, 4))}年${Number(month.slice(5, 7))}月`;
 
 function useHistoryRecords(repository, today, pages, extraDates, version) {

@@ -4,17 +4,23 @@ import { Icon } from '../components/DiaryUI.jsx';
 import { categories, categoryStyle } from '../domain/categories.js';
 import { defaultTheme, enabledThemes, resolveMode } from './index.js';
 
+import { SolidPattern } from './SolidPattern.jsx';
+
+const TodayBeast = lazy(() => import('./BeastHero.jsx').then(({ TodayBeast }) => ({ default: TodayBeast })));
 const BeastHero = lazy(() => import('./BeastHero.jsx'));
 const samples = ['idea', 'book', 'skill'];
 
-export function ThemeHero({ theme }) {
-  return theme.id === 'beast' && <Suspense fallback={null}><BeastHero /></Suspense>;
+export function ThemeHero({ theme, records, ready, active = false }) {
+  if (theme.kind === 'solid') return <SolidPattern theme={theme.id} animated={active} />;
+  if (theme.id !== 'beast') return null;
+  return <Suspense fallback={null}>
+    {records ? <TodayBeast records={records} ready={ready} active={active} /> : <BeastHero />}
+  </Suspense>;
 }
 
 function MiniToday({ theme, mode, compact }) {
   return <div className="theme-mini" data-theme={theme.id} data-mode={mode} aria-hidden="true">
-    {theme.kind === 'style' ? <div className="theme-mini-hero"><ThemeHero theme={theme} /></div>
-      : <div className="theme-mini-band" />}
+    <div className="theme-mini-hero"><ThemeHero theme={theme} /></div>
     {!compact && <strong>今天</strong>}
     <div className="theme-mini-rows">
       {samples.map((id) => <div className="theme-mini-row" key={id} style={categoryStyle(id)}>
@@ -45,7 +51,7 @@ export function ThemePicker({ appearance }) {
   </div>;
 }
 
-export function Welcome({ appearance }) {
+export function Welcome({ appearance, motion }) {
   const [index, setIndex] = useState(0);
   const [finishing, setFinishing] = useState(false);
   const strip = useRef(null);
@@ -59,9 +65,8 @@ export function Welcome({ appearance }) {
   function select(next) {
     const bounded = Math.max(0, Math.min(enabledThemes.length - 1, next));
     const target = strip.current.children[bounded];
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     strip.current.scrollTo({ left: target.offsetLeft - (strip.current.clientWidth - target.offsetWidth) / 2,
-      behavior: reduced ? 'instant' : 'smooth' });
+      behavior: motion ? 'smooth' : 'instant' });
 
   }
 
@@ -77,7 +82,7 @@ export function Welcome({ appearance }) {
 
   function finish(theme) {
     if (finishing) return;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!motion || document.hidden) {
       appearance.finishWelcome(theme);
       return;
     }

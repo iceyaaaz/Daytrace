@@ -1,3 +1,4 @@
+import { effectiveMotion, motionKey } from '../domain/interaction.js';
 import { defaultTheme, enabledThemes, readPreferences, resolveMode, themeKeys } from './index.js';
 
 export function themeBoot(palettes) {
@@ -12,6 +13,10 @@ export function themeBoot(palettes) {
     try { storage = localStorage; } catch {}
     const { theme, preference } = read(storage, ${JSON.stringify(enabledThemes)}, ${JSON.stringify(themeKeys)});
     const mode = resolve(theme, preference, matchMedia('(prefers-color-scheme: dark)').matches);
+    const motion = ${effectiveMotion.toString()};
+    let preferenceMotion;
+    try { preferenceMotion = storage?.getItem(${JSON.stringify(motionKey)}); } catch {}
+    document.documentElement.dataset.motion = motion(preferenceMotion, matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'on' : 'off';
     document.documentElement.dataset.theme = theme.id;
     document.documentElement.dataset.mode = mode;
     document.querySelector('meta[name="theme-color"]').content = ${JSON.stringify(backgrounds)}[theme.id + ':' + mode];

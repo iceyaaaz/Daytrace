@@ -9,15 +9,14 @@ import { RecordForm } from '../components/RecordForm.jsx';
 import { useQuery } from '../components/useQuery.js';
 import quotes from '../data/quotes.json';
 import { categories, categoryIds, categoryStyle } from '../domain/categories.js';
-import { isRecordDate, quoteForDate } from '../domain/dates.js';
+import { formatMonthDay, isRecordDate, quoteForDate } from '../domain/dates.js';
 import { formatDuration, recordErrors } from '../domain/records.js';
 import { entryPanel, hasEntryChanges } from '../domain/entryPanel.js';
 import { minutesTotal } from '../domain/statistics.js';
 
-export const compactDuration = (minutes) => formatDuration(minutes, { compact: true });
-const dateText = (date) => `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`;
 
-export function Today({ today, repository, tags, createTag, version, onChange, navigate, onTitle, theme }) {
+
+export function Today({ today, repository, tags, createTag, version, onChange, navigate, onTitle, theme, active }) {
   const [pickedDate, setPickedDate] = useState('');
   const [selectDate, setSelectDate] = useState(null);
   const [panel, dispatch] = useReducer(entryPanel, null);
@@ -27,7 +26,7 @@ export function Today({ today, repository, tags, createTag, version, onChange, n
   const entryForm = useId();
   const dateForm = useId();
   const date = isRecordDate(pickedDate, today) ? pickedDate : today;
-  const title = date === today ? '今天' : dateText(date);
+  const title = date === today ? '今天' : formatMonthDay(date);
   const quote = quoteForDate(quotes, date);
   const category = panel?.draft.category;
   const focusText = category && !['skill', 'exercise'].includes(category);
@@ -36,6 +35,13 @@ export function Today({ today, repository, tags, createTag, version, onChange, n
   const base = query.data ?? [];
   const records = [...base, ...saved.filter((item) => item.record_date === date && !base.some((row) => row.id === item.id))];
   const total = minutesTotal(records);
+  const loadToday = useCallback((signal) => {
+    if (date === today || theme.id !== 'beast' || !active) return Promise.resolve([]);
+    return repository.listRecords({ start: today, end: today, summary: true }, signal);
+  }, [date, today, repository, theme.id, active]);
+  const actualToday = useQuery(loadToday, `${today}:${date === today}:${theme.id}:${active}:${version}`, { retain: true });
+  const heroRecords = date === today ? records : actualToday.data ?? [];
+  const heroReady = date === today ? query.status === 'ready' : actualToday.status === 'ready' && actualToday.key?.startsWith(today);
 
   useEffect(() => { onTitle(title); }, [title, onTitle]);
   useEffect(() => {
@@ -52,19 +58,19 @@ export function Today({ today, repository, tags, createTag, version, onChange, n
   }
 
   return <div className="v1-today v1-surface">
-    <div className="theme-today-head" data-illustrated={theme.kind === 'style'}>
-      <ThemeHero theme={theme} />
+    <div className="theme-today-head" data-illustrated="true">
+      <ThemeHero theme={theme} records={heroRecords} ready={heroReady} active={active} />
       <div className="v1-large-head">
         <h1>{title}</h1>
         <button type="button" className="v1-icon" aria-label="设置" onClick={() => navigate('settings')}><Icon as={Settings} /></button>
       </div>
       <div className="v1-date-line">
         <button className="v1-text" type="button" aria-label="记录日期" aria-haspopup="dialog" onClick={() => setSelectDate(date)}>
-          {date === today ? <time dateTime={date}>{dateText(date)} {weekdayText(date)}</time> : <span>补记 · {weekdayText(date)}</span>}
+          {date === today ? <time dateTime={date}>{formatMonthDay(date)} {weekdayText(date)}</time> : <span>补记 · {weekdayText(date)}</span>}
           <Icon as={ChevronDown} />
         </button>
         {!!records.length && <span className={total > 1440 ? 'v1-warn' : undefined}>
-          {total <= 1440 && '· '}已记录{compactDuration(total)}{total > 1440 && '，请检查是否重复'}
+          {total <= 1440 && '· '}已记录{formatDuration(total)}{total > 1440 && '，请检查是否重复'}
         </span>}
         {date !== today && <button type="button" className="v1-text v1-return" onClick={() => setPickedDate('')}>回到今天</button>}
       </div>
@@ -110,7 +116,7 @@ export function Today({ today, repository, tags, createTag, version, onChange, n
         onSaved={({ id, values, again }) => {
           setSaved((current) => [...current, { id, record_date: date, ...values }]);
           setAnimated(category);
-          const message = `已保存：${categories[category].label}${values.minutes ? ` · ${compactDuration(values.minutes)}` : ''}`;
+          const message = `已保存：${categories[category].label}${values.minutes ? ` · ${formatDuration(values.minutes)}` : ''}`;
           onChange(message, id);
           if (again) {
             dispatch({ type: 'again' });

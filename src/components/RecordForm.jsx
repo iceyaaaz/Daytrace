@@ -48,9 +48,9 @@ function DurationField({ id, idea, value, onChange, disabled, error, panel }) {
     <div className="chips">
       {shortcuts.map((minutes, index) => <button type="button" className="chip-button" key={minutes}
         data-entry-field={index === 0 ? '' : undefined} aria-pressed={Number(value) === minutes}
-        disabled={disabled} onClick={() => choose(minutes)}><span>{durationOptionLabel(minutes, panel)}</span></button>)}
+        disabled={disabled} onClick={() => choose(minutes)}><span>{durationOptionLabel(minutes)}</span></button>)}
       {other && <button type="button" className="chip-button" aria-pressed="true" disabled={disabled}
-        onClick={() => setShowSelect(true)}><span>{durationOptionLabel(Number(value), panel)}</span></button>}
+        onClick={() => setShowSelect(true)}><span>{durationOptionLabel(Number(value))}</span></button>}
       <button type="button" className="chip-button" disabled={disabled} aria-expanded={showSelect} aria-controls={`${id}-picker`}
         onClick={() => setShowSelect((current) => !current)}><span>其他 <Icon as={ChevronDown} /></span></button>
     </div>
@@ -59,7 +59,7 @@ function DurationField({ id, idea, value, onChange, disabled, error, panel }) {
       <select id={id} value={value} disabled={disabled} onChange={(event) => choose(event.target.value)}
         aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined}>
         <option value="" disabled hidden>请选择时长</option>
-        {durationOptions.map((minutes) => <option key={minutes} value={minutes}>{durationOptionLabel(minutes, panel)}</option>)}
+        {durationOptions.map((minutes) => <option key={minutes} value={minutes}>{durationOptionLabel(minutes)}</option>)}
       </select>
       <Icon as={ChevronDown} />
     </div>}

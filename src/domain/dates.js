@@ -32,3 +32,7 @@ export function quoteForDate(quotes, date) {
   const index = ((days % quotes.length) + quotes.length) % quotes.length;
   return quotes[index];
 }
+
+export function formatMonthDay(date) {
+  return `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`;
+}

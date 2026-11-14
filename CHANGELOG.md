@@ -2,6 +2,7 @@
 
 | 版本 | 更新内容 | 验收 |
 | --- | --- | --- |
+| [v2.4.0-x1](https://github.com/iceyaaaz/Daytrace/tree/v2.4.0-x1) | 新增互动登录、兽主题四种状态、纯色图案与动效设置，统一中文时长显示。 | [X1 验收报告](docs/X1验收.md) |
 | [v2.3.0-w1](https://github.com/iceyaaaz/Daytrace/tree/v2.3.0-w1) | 新增首次主题欢迎页、主题和明暗设置，开放兽、纸页、雾蓝、奶咖、樱雾和墨夜六套主题。 | [W1 验收报告](docs/W1验收.md) |
 | [v2.2.0-v2](https://github.com/iceyaaaz/Daytrace/tree/v2.2.0-v2) | 历史页按月分组，支持搜索、日期跳转和编辑。回顾页合并统计与周报，按周、月、全部查看用时。 | [V2 验收报告](docs/V2验收.md) |
 | [v2.2.0-v1.1](https://github.com/iceyaaaz/Daytrace/tree/v2.2.0-v1.1) | 统一手机页面边距，调整每日一言的字号、颜色和留白。 | [V1 验收报告](docs/V1验收.md) |

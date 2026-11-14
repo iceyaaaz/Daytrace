@@ -24,7 +24,7 @@ test('旧面板的异步结果不会修改新面板', () => {
 });
 
 test('V-08、V-20：新界面采用紧凑的中文时长格式', () => {
-  assert.equal(formatDuration(80, { compact: true }), '1小时20分钟');
-  assert.equal(formatDuration(0, { compact: true }), '0分钟');
-  assert.equal(durationOptionLabel(90, true), '1.5小时');
+  assert.equal(formatDuration(80), '1小时20分钟');
+  assert.equal(formatDuration(0), '0分钟');
+  assert.equal(durationOptionLabel(90), '1.5小时');
 });

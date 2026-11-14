@@ -59,7 +59,6 @@
   width: 100%; min-height: var(--v-min-row); display: flex; justify-content: space-between; text-align: start;
   padding: var(--space-2) var(--space-4); position: relative; border: 0; border-radius: var(--radius-none);
   font-size: var(--v-heading); line-height: var(--v-heading-line); overflow-wrap: anywhere;
-  transition: background-color var(--v-press-motion);
 }
 .v1-row:first-child { border-start-start-radius: var(--v-group-radius); border-start-end-radius: var(--v-group-radius); }
 .v1-row:last-child { border-end-start-radius: var(--v-group-radius); border-end-end-radius: var(--v-group-radius); }
@@ -190,5 +189,5 @@
   @keyframes v1-panel-out { to { opacity: 0; transform: translateY(var(--space-4)); } }
 }
 @media (prefers-reduced-motion: reduce) {
-  .v1-dialog[open], .v1-settings, .v1-bounce, .v1-skeleton { animation: none; }
+  :root:not([data-motion="on"]) :is(.v1-dialog[open], .v1-settings, .v1-bounce, .v1-skeleton) { animation: none; }
 }

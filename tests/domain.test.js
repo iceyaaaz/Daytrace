@@ -28,10 +28,10 @@ test('T-12：完整 35 档与时长文字', () => {
   assert.deepEqual(durationOptions.slice(0, 12), [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
   assert.ok(durationOptions.slice(12).every((value, index) => value === 60 + index * 30));
   assert.equal(durationOptions.at(-1), 720);
-  assert.equal(durationOptionLabel(55), '55 分钟');
-  assert.equal(durationOptionLabel(90), '1.5 小时');
+  assert.equal(durationOptionLabel(55), '55分钟');
+  assert.equal(durationOptionLabel(90), '1.5小时');
   assert.deepEqual([0, 5, 55, 60, 80, 90, 720].map((minutes) => formatDuration(minutes)), [
-    '0 分钟', '5 分钟', '55 分钟', '1 小时', '1 小时 20 分钟', '1 小时 30 分钟', '12 小时',
+    '0分钟', '5分钟', '55分钟', '1小时', '1小时20分钟', '1小时30分钟', '12小时',
   ]);
 });
 

@@ -31,7 +31,6 @@ button {
   color: var(--text);
   padding: var(--space-2) var(--space-3);
   cursor: pointer;
-  transition: background-color var(--motion) var(--ease);
 }
 @media (hover: hover) {
   button:hover:not(:disabled) { background: var(--brand-soft); }
@@ -242,8 +241,8 @@ button[aria-current="page"], .filters button[aria-pressed="true"] {
 .entry-plus svg.lucide { width: var(--icon-small); height: var(--icon-small); }
 .entry-form { padding: var(--space-4); }
 .entry-form .record-form { margin: 0; }
-.collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--expand) var(--ease); }
-.collapse[data-open="true"] { grid-template-rows: 1fr; }
+.collapse { display: grid; grid-template-rows: 0fr; }
+.collapse[data-open="true"] { grid-template-rows: 1fr; animation: x1-fade-in var(--expand) var(--ease); }
 .collapse-clip { min-height: 0; overflow: hidden; }
 .chip-field { min-width: 0; border: 0; margin: 0; padding: 0; }
 .chip-field legend { padding: 0; }

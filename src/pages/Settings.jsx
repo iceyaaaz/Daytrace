@@ -1,4 +1,5 @@
 import { ThemePicker } from '../themes/ThemeViews.jsx';
+import { motionLabels } from '../domain/interaction.js';
 import { modeLabels } from '../themes/index.js';
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
@@ -67,7 +68,7 @@ function ExportCard({ repository }) {
   </Group>;
 }
 
-export function Settings({ repository, tagQuery, createTag, removeTag, signOut, appearance, onBack }) {
+export function Settings({ repository, tagQuery, createTag, removeTag, signOut, appearance, motion, onBack }) {
   const [themePage, setThemePage] = useState(false);
   const fixedMode = appearance.theme.modes.length === 1;
   const [tagsPage, setTagsPage] = useState(false);
@@ -108,12 +109,19 @@ export function Settings({ repository, tagQuery, createTag, removeTag, signOut, 
           onClick={() => { setThemePage(true); window.scrollTo(0, 0); }}>主题</Row>
         <Row disabled={fixedMode} value={fixedMode ? '该主题仅有' + modeLabels[appearance.mode] + '版本' : modeLabels[appearance.preference]}
           onClick={() => open({ type: 'mode' })}>明暗</Row>
+        <Row value={motionLabels[motion.preference]} onClick={() => open({ type: 'motion' })}>动效</Row>
+        <p className="x1-motion-note">{motion.preference === 'system' && motion.systemReduced
+          ? '当前系统已开启减少动态效果'
+          : '关闭后，角色和场景保持静止；也会尊重系统的“减少动态效果”。'}</p>
       </Group>
       <Group label="内容"><Row onClick={() => { setTagsPage(true); window.scrollTo(0, 0); }}>标签管理</Row></Group>
       <ExportCard repository={repository} />
       <Group label="账号"><button className="v1-row v1-danger v1-centered" type="button" onClick={() => open({ type: 'logout' })}>退出登录</button></Group>
       <footer className="v1-settings-version">日迹 · 版本{appVersion}</footer>
     </>}
+    {dialog?.type === 'motion' && <ActionMenu title="动效" onCancel={close} options={Object.entries(motionLabels).map(([value, label]) => ({
+      label, selected: motion.preference === value, action: () => { motion.setPreference(value); close(); },
+    }))} />}
     {dialog?.type === 'mode' && <ActionMenu title="明暗" onCancel={close} options={Object.entries(modeLabels).map(([value, label]) => ({
       label, selected: appearance.preference === value, action: () => { appearance.setPreference(value); close(); },
     }))} />}

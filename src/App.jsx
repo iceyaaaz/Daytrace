@@ -1,4 +1,6 @@
 import { useAppearance } from './themes/ThemeProvider.jsx';
+import { useMotion } from './themes/motion.js';
+import { Login } from './pages/Login.jsx';
 import { Welcome } from './themes/ThemeViews.jsx';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, ChartNoAxesColumn, Check, SquarePen } from 'lucide-react';
@@ -17,50 +19,7 @@ import { Today } from './pages/Today.jsx';
 
 const tabs = [['today', '今日', SquarePen], ['history', '历史', CalendarDays], ['review', '回顾', ChartNoAxesColumn]];
 
-function Login({ client }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [pending, setPending] = useState(false);
-
-  async function submit(event) {
-    event.preventDefault();
-    if (!client || pending) return;
-    setError('');
-    setPending(true);
-    try {
-      const result = await client.auth.signInWithPassword({ email: email.trim(), password });
-      if (result.error) throw result.error;
-    } catch {
-      setError('邮箱或密码不正确');
-    } finally {
-      setPending(false);
-    }
-  }
-
-  return <main className="login-layout">
-    <section className="card login-card">
-      <span className="brand-mark" aria-hidden="true">日</span>
-      <h1>日迹</h1>
-      <p className="muted">时间与成长记录</p>
-      <form className="record-form" onSubmit={submit}>
-        <label htmlFor="email">邮箱
-          <input id="email" type="email" autoComplete="username" required value={email}
-            onChange={(event) => setEmail(event.target.value)} disabled={pending} />
-        </label>
-        <label htmlFor="password">密码
-          <input id="password" type="password" autoComplete="current-password" required value={password}
-            onChange={(event) => setPassword(event.target.value)} disabled={pending} />
-        </label>
-        <button className="primary" type="submit" disabled={!client || pending}>{pending ? '正在登录…' : '登录'}</button>
-        <Feedback error={error} />
-      </form>
-      {!client && <p className="notice" role="status">还没有连接 Supabase。请按 README 设置项目网址和公开密钥，再重启本地网页。</p>}
-    </section>
-  </main>;
-}
-
-function Diary({ client, appearance }) {
+function Diary({ client, appearance, motion }) {
   const repository = useMemo(() => createRepository(client), [client]);
   const [page, setPage] = useState('today');
   const [today, setToday] = useState(() => localDate());
@@ -171,11 +130,11 @@ function Diary({ client, appearance }) {
     <main className="shell v1-main" ref={content} data-settings={page === 'settings'}>
       {['today', 'history'].includes(page) && tagQuery.status === 'error' &&
         <QueryState query={tagQuery} message="读取标签失败，请检查网络后重试。" />}
-      <div hidden={page !== 'today'} data-active={page === 'today'}><Today {...props} theme={appearance.theme} onTitle={setTodayTitle} /></div>
+      <div hidden={page !== 'today'} data-active={page === 'today'}><Today {...props} theme={appearance.theme} active={page === 'today'} onTitle={setTodayTitle} /></div>
       {historyVisited && <div className="v1-history-shell" hidden={page !== 'history'} data-active={page === 'history'}><History {...props} /></div>}
       {reviewVisited && <div className="v1-review-shell" hidden={page !== 'review'} data-active={page === 'review'}><Review {...props} /></div>}
       {page === 'settings' && <Settings repository={repository} tagQuery={tagQuery} createTag={createTag} removeTag={removeTag}
-        signOut={signOut} appearance={appearance} onBack={() => navigate('today')} />}
+        signOut={signOut} appearance={appearance} motion={motion} onBack={() => navigate('today')} />}
     </main>
     {page !== 'settings' && <nav className="v1-nav" aria-label="主导航"><div className="shell">
       {tabs.map(([id, label, graphic]) => <button key={id} type="button" aria-current={page === id ? 'page' : undefined}
@@ -192,6 +151,8 @@ function Diary({ client, appearance }) {
 
 export default function App() {
   const appearance = useAppearance();
+  const motion = useMotion();
+  const [loginInProgress, setLoginInProgress] = useState(false);
   const [session, setSession] = useState(undefined);
   useEffect(() => {
     const keyboard = (event) => {
@@ -201,7 +162,6 @@ export default function App() {
     window.addEventListener('keydown', keyboard, true);
     window.addEventListener('pointerdown', pointer, true);
     return () => {
-      media.removeEventListener('change', sync);
       window.removeEventListener('keydown', keyboard, true);
       window.removeEventListener('pointerdown', pointer, true);
     };
@@ -211,8 +171,9 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, current) => setSession(current));
     return () => subscription.unsubscribe();
   }, []);
-  if (!supabase || session === null) return <Login client={supabase} />;
+  if (!supabase || session === null || loginInProgress) return <Login client={supabase} theme={appearance.theme}
+    motion={motion.enabled} setLoginInProgress={setLoginInProgress} />;
   if (session === undefined) return <main className="login-layout"><p role="status">正在检查登录状态…</p></main>;
-  if (!appearance.welcomeSeen) return <Welcome appearance={appearance} />;
-  return <Diary key={session.user.id} client={supabase} appearance={appearance} />;
+  if (!appearance.welcomeSeen) return <Welcome appearance={appearance} motion={motion.enabled} />;
+  return <Diary key={session.user.id} client={supabase} appearance={appearance} motion={motion} />;
 }

@@ -42,7 +42,7 @@
   --v2-overview-size: 34px; --v2-overview-line: 40px;
   --v2-swipe-width: 72px; --v2-chart-height: 180px; --v2-axis-size: 12px;
   --v2-chart-label-row: 22px; --v2-month-col: 20px; --v2-rank-bar: 3px; --v2-chart-motion: 400ms;
-  --theme-motion: 240ms; --welcome-fade: 400ms;
+  --welcome-fade: 400ms;
   --theme-hero-height: 168px; --theme-slide-height: 380px; --theme-tile-height: 150px;
   --theme-band-height: 30px; --theme-welcome-band-height: 64px;
   --theme-selected-border: 2px solid var(--brand);
@@ -51,5 +51,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root { --motion: 0ms; --expand: 0ms; --v-panel-motion: 0ms; --v-press-motion: 0ms; --v-bounce-motion: 0ms; --v2-chart-motion: 0ms; --theme-motion: 0ms; --welcome-fade: 0ms; }
+  :root:not([data-motion="on"]) { --motion: 0ms; --expand: 0ms; --v-panel-motion: 0ms; --v-press-motion: 0ms; --v-bounce-motion: 0ms; --v2-chart-motion: 0ms; --welcome-fade: 0ms; }
 }

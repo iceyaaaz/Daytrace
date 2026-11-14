@@ -1,6 +1,6 @@
 {
   "name": "daytrace",
-  "version": "2.3.0-w1",
+  "version": "2.4.0-x1",
   "description": "日迹，记录时间与成长的中文日记应用",
   "private": true,
   "type": "module",

@@ -52,7 +52,7 @@ export function weekComparison(total, previous, previousDays) {
   if (!previousDays) return '上周没有记录';
   const delta = total - previous;
   if (!delta) return '与上周持平';
-  return `比上周${delta > 0 ? '多' : '少'} ${formatDuration(Math.abs(delta))}`;
+  return `比上周${delta > 0 ? '多' : '少'}${formatDuration(Math.abs(delta))}`;
 }
 
 export function reviewCategories(records) {

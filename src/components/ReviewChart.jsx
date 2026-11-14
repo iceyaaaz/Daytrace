@@ -82,7 +82,7 @@ export function ReviewChart({ buckets, view }) {
           </div>)}
         </div>
       </div>
-      <div className="v2-chart-axis" aria-hidden="true"><span>{formatDuration(maximum, { compact: true })}</span><span>0</span></div>
+      <div className="v2-chart-axis" aria-hidden="true"><span>{formatDuration(maximum)}</span><span>0</span></div>
     </div>
   </figure>;
 }

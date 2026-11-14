@@ -41,7 +41,7 @@ test('24 条记录手算：本周 240 分钟，4 天，日均 60，比上周多 
   assert.equal(current.total, 240);
   assert.equal(current.recordedDays, 4);
   assert.equal(dailyAverage(current.total, current.recordedDays), 60);
-  assert.equal(weekComparison(current.total, previous.total, previous.recordedDays), '比上周多 2 小时');
+  assert.equal(weekComparison(current.total, previous.total, previous.recordedDays), '比上周多2小时');
   assert.equal(percentage(180, 240), '75%');
   assert.deepEqual(current.tags.map(({ minutes }) => minutes), [180, 180]);
   assert.deepEqual(reviewCategories(records.slice(0, 12)), [{ category: 'skill', minutes: 180 }, { category: 'book', minutes: 60 }]);
@@ -51,8 +51,8 @@ test('无记录、有零分钟的记录、非整除日均、持平和不足 1%',
   assert.equal(dailyAverage(0, 0), null);
   assert.equal(dailyAverage(5, 2), 3);
   assert.equal(weekComparison(5, 0, 0), '上周没有记录');
-  assert.equal(weekComparison(5, 0, 1), '比上周多 5 分钟');
-  assert.equal(weekComparison(5, 10, 1), '比上周少 5 分钟');
+  assert.equal(weekComparison(5, 0, 1), '比上周多5分钟');
+  assert.equal(weekComparison(5, 10, 1), '比上周少5分钟');
   assert.equal(weekComparison(0, 0, 1), '与上周持平');
   assert.equal(percentage(0, 0), '0%');
   assert.equal(percentage(5, 1000), '<1%');
